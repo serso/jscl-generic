@@ -12,7 +12,7 @@ import java.util.List;
  * Date: 2/18/12
  * Time: 11:21 PM
  */
-public enum ExpressionSummizer {
+enum ExpressionSummizer {
 
 	instance;
 

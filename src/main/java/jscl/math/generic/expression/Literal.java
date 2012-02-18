@@ -1,34 +1,63 @@
 package jscl.math.generic.expression;
 
-import com.sun.org.apache.xpath.internal.operations.Variable;
+import jscl.ImmutableObjectBuilder;
 import jscl.math.function.Fraction;
 import jscl.math.function.Pow;
 import jscl.math.generic.Generic;
+import jscl.math.generic.Variable;
 import jscl.math.polynomial.Monomial;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.solovyev.common.utils.Converter;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Literal implements Comparable {
 
+	@NotNull
 	private final List<Productand> productands;
-	private int degree;
 
-	Literal() {
+	public static class Builder extends ImmutableObjectBuilder<Literal>{
+
+		private final List<Productand> productands;
+
+		public Builder(int initialCapacity) {
+			this.productands = new ArrayList<Productand>(initialCapacity);
+		}
+
+		public void addProductand(@NotNull Productand p) {
+			if ( isLocked() ) {
+				throw new IllegalStateException("Cannot add productand to already created expression!");
+			}
+			this.productands.add(p);
+		}
+
+		public void addProductand(@NotNull Variable variable, int exponent) {
+			addProductand(Productand.newInstance(variable, exponent));
+		}
+
+		public void addProductand(@NotNull Variable variable) {
+			addProductand(Productand.newInstance(variable));
+		}
+
+		@NotNull
+		public Literal build0 () {
+		  	return new Literal(productands);
+		}
 	}
 
-	Literal(int size) {
-		init(size);
+	private Literal(@NotNull List<Productand> productands) {
+		this.productands = productands;
 	}
 
-	public int size() {
-		return size;
+	@NotNull
+	public List<Productand> getProductands() {
+		return Collections.unmodifiableList(productands);
+	}
+	
+	public int getSize() {
+		return this.productands.size();
 	}
 
 	@NotNull
@@ -40,72 +69,8 @@ public class Literal implements Comparable {
 		return powers[i];
 	}
 
-	void init(int size) {
-		variables = new Variable[size];
-		powers = new int[size];
-		this.size = size;
-	}
-
-	void resize(int size) {
-		if (size < variables.length) {
-			Variable variable[] = new Variable[size];
-			int power[] = new int[size];
-			System.arraycopy(this.variables, 0, variable, 0, size);
-			System.arraycopy(this.powers, 0, power, 0, size);
-			this.variables = variable;
-			this.powers = power;
-			this.size = size;
-		}
-	}
-
 	public Literal multiply(@NotNull Literal that) {
-		final Literal result = newInstance(size + that.size);
-		int i = 0;
-
-		int thisI = 0;
-		int thatI = 0;
-
-		Variable thisVariable = thisI < this.size ? this.variables[thisI] : null;
-		Variable thatVariable = thatI < that.size ? that.variables[thatI] : null;
-
-		while (thisVariable != null || thatVariable != null) {
-			int c = thisVariable == null ? 1 : (thatVariable == null ? -1 : thisVariable.compareTo(thatVariable));
-
-			if (c < 0) {
-				int s = powers[thisI];
-				result.variables[i] = thisVariable;
-				result.powers[i] = s;
-				result.degree += s;
-				i++;
-				thisI++;
-				thisVariable = thisI < size ? variables[thisI] : null;
-			} else if (c > 0) {
-				int s = that.powers[thatI];
-				result.variables[i] = thatVariable;
-				result.powers[i] = s;
-				result.degree += s;
-				i++;
-				thatI++;
-				thatVariable = thatI < that.size ? that.variables[thatI] : null;
-			} else {
-				int s = powers[thisI] + that.powers[thatI];
-
-				result.variables[i] = thisVariable;
-				result.powers[i] = s;
-				result.degree += s;
-
-				i++;
-				thisI++;
-				thatI++;
-
-				thisVariable = thisI < this.size ? this.variables[thisI] : null;
-				thatVariable = thatI < that.size ? that.variables[thatI] : null;
-			}
-		}
-
-		result.resize(i);
-
-		return result;
+		return LiteralMultiplicator.instance.multiply(this, that);
 	}
 
 	public Literal divide(Literal literal) throws ArithmeticException {
@@ -343,7 +308,7 @@ public class Literal implements Comparable {
 	}
 
 	public static Literal valueOf(Variable variable, int power) {
-		Literal l = new Literal();
+		Literal l = new Literal(productands);
 		l.init(variable, power);
 		return l;
 	}
@@ -358,7 +323,7 @@ public class Literal implements Comparable {
 	}
 
 	public static Literal valueOf(Monomial monomial) {
-		Literal l = new Literal();
+		Literal l = new Literal(productands);
 		l.init(monomial);
 		return l;
 	}

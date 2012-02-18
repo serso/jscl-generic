@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Date: 2/19/12
  * Time: 12:27 AM
  */
-public class Productand {
+public class Productand implements Comparable<Productand>{
 
 	@NotNull
 	private final Variable variable;
@@ -22,8 +22,8 @@ public class Productand {
 	}
 
 	@NotNull
-	public static Productand newInstance(@NotNull Variable variable, int power) {
-		return new Productand(variable, power);
+	public static Productand newInstance(@NotNull Variable variable, int exponent) {
+		return new Productand(variable, exponent);
 	}
 
 	@NotNull
@@ -38,5 +38,9 @@ public class Productand {
 
 	public int getExponent() {
 		return exponent;
+	}
+
+	public int compareTo(@NotNull Productand that) {
+		return this.variable.compareTo(that.variable);
 	}
 }

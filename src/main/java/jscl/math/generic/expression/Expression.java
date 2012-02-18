@@ -1,5 +1,6 @@
 package jscl.math.generic.expression;
 
+import jscl.ImmutableObjectBuilder;
 import jscl.JsclMathEngine;
 import jscl.math.NotDivisibleException;
 import jscl.math.function.Constant;
@@ -30,19 +31,17 @@ public class Expression extends Generic {
 		this.summands = summands;
 	}
 
-	public static class Builder {
+	public static class Builder extends ImmutableObjectBuilder<Expression> {
 
 		@NotNull
 		private final List<Summand> summands;
-		
-		private boolean lock = false;
 
 		public Builder(int initialCapacity) {
 			this.summands = new ArrayList<Summand>(initialCapacity);
 		}
 		
 		public void addSummand(@NotNull Summand s) {
-			if ( lock ) {
+			if ( isLocked() ) {
 				throw new IllegalStateException("Cannot add summand to already created expression!");
 			}
 			this.summands.add(s);
@@ -53,8 +52,7 @@ public class Expression extends Generic {
 		}
 
 		@NotNull
-		public Expression build () {
-			this.lock = true;
+		public Expression build0 () {
 			return new Expression(this.summands);
 		}
 	}
@@ -603,7 +601,7 @@ public class Expression extends Generic {
 
 	public static Expression valueOf(@NotNull Constant constant) {
 		final Expression expression = new Expression(1);
-		Literal literal = new Literal();
+		Literal literal = new Literal(productands);
 		literal.init(constant, 1);
 		expression.init(literal, JsclInteger.ONE);
 		return expression;
@@ -611,7 +609,7 @@ public class Expression extends Generic {
 
 	public static Expression valueOf(@NotNull Double value) {
 		final Expression expression = new Expression(1);
-		Literal literal = new Literal();
+		Literal literal = new Literal(productands);
 		literal.init(new DoubleVariable(new NumericWrapper(Real.valueOf(value))), 1);
 		expression.init(literal, JsclInteger.ONE);
 		return expression;
@@ -636,7 +634,7 @@ public class Expression extends Generic {
 
 	public static Expression init(@NotNull NumericWrapper numericWrapper) {
 		final Expression expression = new Expression(1);
-		Literal literal = new Literal();
+		Literal literal = new Literal(productands);
 		literal.init(new ExpressionVariable(numericWrapper), 1);
 		expression.init(literal, JsclInteger.ONE);
 		return expression;
