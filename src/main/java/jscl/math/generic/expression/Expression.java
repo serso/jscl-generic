@@ -9,6 +9,7 @@ import jscl.math.function.Inverse;
 import jscl.math.generic.DivideAndRemainderResult;
 import jscl.math.generic.Generic;
 import jscl.math.generic.GenericInteger;
+import jscl.math.generic.expression.literal.Literal;
 import jscl.math.numeric.Real;
 import jscl.math.polynomial.Polynomial;
 import jscl.math.polynomial.UnivariatePolynomial;
@@ -53,6 +54,11 @@ public class Expression extends Generic {
 
 		@NotNull
 		public Expression build0 () {
+			// avoid not used memory
+			if (summands instanceof ArrayList) {
+				((ArrayList) summands).trimToSize();
+			}
+
 			return new Expression(this.summands);
 		}
 	}
@@ -224,10 +230,12 @@ public class Expression extends Generic {
 
 	@NotNull
 	public Literal literalScm() {
-		Literal result = Literal.newInstance();
-		for (int i = 0; i < size; i++) {
-			result = result.scm(literals[i]);
+		Literal result = Literal.newEmpty();
+
+		for (Summand summand : summands) {
+			result = result.scm(summand.getLiteral());
 		}
+
 		return result;
 	}
 
@@ -418,7 +426,7 @@ public class Expression extends Generic {
 			Literal l = literals[0];
 			JsclInteger en = coefficients[0];
 			if (en.compareTo(JsclInteger.valueOf(1)) == 0) return l.powerValue();
-			else if (l.degree() == 0) return en.powerValue();
+			else if (l.getDegree() == 0) return en.powerValue();
 			else throw new NotPowerException();
 		} else throw new NotPowerException();
 	}
@@ -445,7 +453,7 @@ public class Expression extends Generic {
 			final Literal l = literals[0];
 			final JsclInteger c = coefficients[0];
 
-			if (l.degree() == 0) {
+			if (l.getDegree() == 0) {
 				return c;
 			} else {
 				throw new NotIntegerException();
@@ -688,7 +696,7 @@ public class Expression extends Generic {
 				result.append("+");
 			}
 
-			if (literal.degree() == 0) {
+			if (literal.getDegree() == 0) {
 				result.append(coefficient);
 			} else {
 				if (coefficient.abs().compareTo(JsclInteger.ONE) == 0) {
@@ -720,7 +728,7 @@ public class Expression extends Generic {
 					en = (JsclInteger) en.negate();
 				} else result.append(".add(");
 			}
-			if (l.degree() == 0) result.append(en.toJava());
+			if (l.getDegree() == 0) result.append(en.toJava());
 			else {
 				if (en.abs().compareTo(JsclInteger.valueOf(1)) == 0) {
 					if (en.signum() > 0) result.append(l.toJava());
@@ -748,7 +756,7 @@ public class Expression extends Generic {
 				e2.appendChild(element.text("+"));
 				e1.appendChild(e2);
 			}
-			if (l.degree() == 0) separateSign(e1, en);
+			if (l.getDegree() == 0) separateSign(e1, en);
 			else {
 				if (en.abs().compareTo(JsclInteger.valueOf(1)) == 0) {
 					if (en.signum() < 0) {

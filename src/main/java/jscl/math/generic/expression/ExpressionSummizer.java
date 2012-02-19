@@ -41,7 +41,7 @@ enum ExpressionSummizer {
 			} else if (rs == null) {
 				c = -1;
 			} else {
-				c = -ls.compareTo(rs);
+				c = -ls.getLiteral().compareTo(rs.getLiteral());
 			}
 
 			if (c < 0) {

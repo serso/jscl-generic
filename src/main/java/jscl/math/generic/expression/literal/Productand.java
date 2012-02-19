@@ -1,4 +1,4 @@
-package jscl.math.generic.expression;
+package jscl.math.generic.expression.literal;
 
 
 import jscl.math.generic.Variable;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Date: 2/19/12
  * Time: 12:27 AM
  */
-public class Productand implements Comparable<Productand>{
+class Productand {
 
 	@NotNull
 	private final Variable variable;
@@ -22,12 +22,12 @@ public class Productand implements Comparable<Productand>{
 	}
 
 	@NotNull
-	public static Productand newInstance(@NotNull Variable variable, int exponent) {
+	static Productand newInstance(@NotNull Variable variable, int exponent) {
 		return new Productand(variable, exponent);
 	}
 
 	@NotNull
-	public static Productand newInstance(@NotNull Variable variable) {
+	static Productand newInstance(@NotNull Variable variable) {
 		return new Productand(variable, 1);
 	}
 
@@ -40,7 +40,4 @@ public class Productand implements Comparable<Productand>{
 		return exponent;
 	}
 
-	public int compareTo(@NotNull Productand that) {
-		return this.variable.compareTo(that.variable);
-	}
 }

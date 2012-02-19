@@ -1,6 +1,7 @@
 package jscl.math.generic.expression;
 
 import jscl.math.generic.GenericInteger;
+import jscl.math.generic.expression.literal.Literal;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Date: 2/18/12
  * Time: 10:56 PM
  */
-public class Summand implements Comparable<Summand> {
+class Summand {
 
 	@NotNull
 	private final Literal literal;
@@ -23,13 +24,9 @@ public class Summand implements Comparable<Summand> {
 	}
 
 	@NotNull
-	public static Summand newInstance(@NotNull GenericInteger coefficient,
-									  @NotNull Literal literal) {
+	static Summand newInstance(@NotNull GenericInteger coefficient,
+							   @NotNull Literal literal) {
 		return new Summand(coefficient, literal);
-	}
-
-	public int compareTo(@NotNull Summand that) {
-		return this.literal.compareTo(that.literal);
 	}
 
 	@NotNull
@@ -43,7 +40,7 @@ public class Summand implements Comparable<Summand> {
 	}
 
 	@NotNull
-	public Summand multiply ( @NotNull Summand that ) {
+	public Summand multiply(@NotNull Summand that) {
 		return newInstance(this.coefficient.multiply(that.coefficient), this.literal.multiply(that.literal));
 	}
 }

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * Time: 11:02 PM
  */
 public class GenericInteger extends Generic{
+
 	public boolean isZero() {
 		throw new UnsupportedOperationException();
 	}
