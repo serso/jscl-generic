@@ -3,6 +3,7 @@ package jscl.math.generic.expression;
 import jscl.ImmutableObjectBuilder;
 import jscl.JsclMathEngine;
 import jscl.math.NotDivisibleException;
+import jscl.math.Variable;
 import jscl.math.function.Constant;
 import jscl.math.function.Fraction;
 import jscl.math.function.Inverse;
@@ -14,8 +15,8 @@ import jscl.math.numeric.Real;
 import jscl.math.polynomial.Polynomial;
 import jscl.math.polynomial.UnivariatePolynomial;
 import jscl.mathml.MathML;
-import jscl.text.*;
-import jscl.text.msg.Messages;
+import jscl.newText.*;
+import jscl.newText.msg.Messages;
 import jscl.util.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -742,26 +743,26 @@ public class Expression extends Generic {
 	}
 
 	public void toMathML(MathML element, @Nullable Object data) {
-		MathML e1 = element.element("mrow");
+		MathML e1 = element.newElement("mrow");
 		if (signum() == 0) {
-			MathML e2 = element.element("mn");
-			e2.appendChild(element.text("0"));
+			MathML e2 = element.newElement("mn");
+			e2.appendChild(element.newText("0"));
 			e1.appendChild(e2);
 		}
 		for (int i = 0; i < size; i++) {
 			Literal l = literals[i];
 			JsclInteger en = coefficients[i];
 			if (en.signum() > 0 && i > 0) {
-				MathML e2 = element.element("mo");
-				e2.appendChild(element.text("+"));
+				MathML e2 = element.newElement("mo");
+				e2.appendChild(element.newText("+"));
 				e1.appendChild(e2);
 			}
 			if (l.getDegree() == 0) separateSign(e1, en);
 			else {
 				if (en.abs().compareTo(JsclInteger.valueOf(1)) == 0) {
 					if (en.signum() < 0) {
-						MathML e2 = element.element("mo");
-						e2.appendChild(element.text("-"));
+						MathML e2 = element.newElement("mo");
+						e2.appendChild(element.newText("-"));
 						e1.appendChild(e2);
 					}
 				} else separateSign(e1, en);
@@ -771,7 +772,7 @@ public class Expression extends Generic {
 		element.appendChild(e1);
 	}
 
-	@NotNull
+/*	@NotNull
 	@Override
 	public Set<? extends Constant> getConstants() {
 		final Set<Constant> result = new HashSet<Constant>();
@@ -783,12 +784,12 @@ public class Expression extends Generic {
 		}
 
 		return result;
-	}
+	}*/
 
 	public static void separateSign(MathML element, Generic generic) {
 		if (generic.signum() < 0) {
-			MathML e1 = element.element("mo");
-			e1.appendChild(element.text("-"));
+			MathML e1 = element.newElement("mo");
+			e1.appendChild(element.newText("-"));
 			element.appendChild(e1);
 			generic.negate().toMathML(element, null);
 		} else {
@@ -800,36 +801,4 @@ public class Expression extends Generic {
 	private Expression newInstance(int n) {
 		return new Expression(n);
 	}
-
-	protected static final Converter<Variable, Generic> FACTORIZE_CONVERTER = new Converter<Variable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Variable variable) {
-			return variable.factorize();
-		}
-	};
-
-	protected static final Converter<Variable, Generic> ELEMENTARY_CONVERTER = new Converter<Variable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Variable variable) {
-			return variable.elementary();
-		}
-	};
-
-	protected static final Converter<Variable, Generic> EXPAND_CONVERTER = new Converter<Variable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Variable variable) {
-			return variable.expand();
-		}
-	};
-
-	protected static final Converter<Variable, Generic> NUMERIC_CONVERTER = new Converter<Variable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Variable variable) {
-			return variable.numeric();
-		}
-	};
 }

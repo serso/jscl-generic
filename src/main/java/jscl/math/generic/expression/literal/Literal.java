@@ -201,12 +201,15 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 		}
 	}*/
 
-	Map<Variable, Generic> content(@NotNull Converter<Variable, Generic> c) {
+	@NotNull
+	public Map<Variable, Generic> content(@NotNull Converter<Variable, Generic> c) {
 		final Map<Variable, Generic> result = new TreeMap<Variable, Generic>();
 
 		for (Productand productand : productands) {
 			final Variable variable = productand.getVariable();
-			result.put(variable, c.convert(variable));
+			if (!result.containsKey(variable)) {
+				result.put(variable, c.convert(variable));
+			}
 		}
 
 		return result;

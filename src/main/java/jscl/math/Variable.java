@@ -11,7 +11,7 @@ import org.solovyev.common.utils.StringUtils;
 
 import java.util.*;
 
-public abstract class Variable implements Comparable, MathEntity {
+public abstract class Variable implements Comparable<Variable>, MathEntity, Transformable {
 
 	@NotNull
 	public static final Comparator<Variable> comparator = VariableComparator.instance;
@@ -68,17 +68,7 @@ public abstract class Variable implements Comparable, MathEntity {
 
 	public abstract Generic substitute(Variable variable, Generic generic);
 
-	public abstract Generic expand();
-
-	public abstract Generic factorize();
-
-	public abstract Generic elementary();
-
-	public abstract Generic simplify();
-
-	public abstract Generic numeric();
-
-/*	@NotNull
+	/*	@NotNull
    public Expression expressionValue() {
 	   return Expression.valueOf(this);
    }*/
@@ -90,10 +80,6 @@ public abstract class Variable implements Comparable, MathEntity {
 	}
 
 	public abstract int compareTo(Variable variable);
-
-	public int compareTo(Object o) {
-		return compareTo((Variable) o);
-	}
 
 	public boolean equals(Object obj) {
 		return obj instanceof Variable && compareTo((Variable) obj) == 0;
@@ -143,37 +129,5 @@ public abstract class Variable implements Comparable, MathEntity {
 /*
 	@NotNull
 	public abstract Set<? extends Constant> getConstants();*/
-
-	protected static final Converter<Generic, Generic> FACTORIZE_CONVERTER = new Converter<Generic, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Generic generic) {
-			return generic.factorize();
-		}
-	};
-
-	protected static final Converter<Generic, Generic> ELEMENTARY_CONVERTER = new Converter<Generic, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Generic generic) {
-			return generic.elementary();
-		}
-	};
-
-	protected static final Converter<Generic, Generic> EXPAND_CONVERTER = new Converter<Generic, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Generic generic) {
-			return generic.expand();
-		}
-	};
-
-	protected static final Converter<Generic, Generic> NUMERIC_CONVERTER = new Converter<Generic, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Generic generic) {
-			return generic.numeric();
-		}
-	};
 }
 
