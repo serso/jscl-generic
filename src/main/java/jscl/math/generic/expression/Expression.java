@@ -185,6 +185,7 @@ public class Expression extends Generic {
 		}
 	}
 
+	@NotNull
 	public Generic gcd(@NotNull Generic generic) {
 		if (generic instanceof Expression) {
 			final Expression that = (Expression) generic;
@@ -234,12 +235,13 @@ public class Expression extends Generic {
 		Literal result = Literal.newEmpty();
 
 		for (Summand summand : summands) {
-			result = result.scm(summand.getLiteral());
+			result = result.lcm(summand.getLiteral());
 		}
 
 		return result;
 	}
 
+	@NotNull
 	public Generic negate() {
 		return multiply(JsclInteger.valueOf(-1));
 	}

@@ -104,8 +104,8 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 	}
 
 	@NotNull
-	public Literal scm(@NotNull Literal that) {
-		return LiteralScm.instance.scm(this, that);
+	public Literal lcm(@NotNull Literal that) {
+		return LiteralLcm.instance.lcm(this, that);
 	}
 
 /*	public Generic[] productValue() throws NotProductException {

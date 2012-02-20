@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
  * Date: 2/20/12
  * Time: 12:53 AM
  */
-enum LiteralScm {
+enum LiteralLcm {
 
 	instance;
 
 	@NotNull
-	public Literal scm(@NotNull Literal l, @NotNull Literal r) {
+	public Literal lcm(@NotNull Literal l, @NotNull Literal r) {
 		final Literal.Builder result = new Literal.Builder(l.getSize() + r.getSize());
 
 		MutableInt li = new MutableInt();

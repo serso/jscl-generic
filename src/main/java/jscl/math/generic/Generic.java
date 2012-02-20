@@ -1,40 +1,20 @@
 package jscl.math.generic;
 
-import jscl.math.Arithmetic;
-import jscl.math.NotDivisibleException;
-import jscl.math.NotIntegrableException;
-import jscl.math.Variable;
-import jscl.math.generic.expression.Expression;
+import jscl.math.*;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Generic implements Arithmetic<Generic>, Comparable {
+public abstract class Generic implements Arithmetic<Generic>, Comparable, Transformable, IGeneric<Generic> {
 
 	@NotNull
 	public Generic subtract(@NotNull Generic that) {
 		return add(that.negate());
 	}
 
-	public boolean multiple(Generic generic) throws ArithmeticException {
-		return remainder(generic).signum() == 0;
+	public boolean isMultiple(@NotNull Generic that) throws ArithmeticException {
+		return getRemainder(that).isZero();
 	}
-
-/*    public Arithmetic add(@NotNull Arithmetic arithmetic) {
-        return add((Generic)arithmetic);
-    }
-
-    public Arithmetic subtract(@NotNull Arithmetic arithmetic) {
-        return subtract((Generic)arithmetic);
-    }
-
-    public Arithmetic multiply(@NotNull Arithmetic arithmetic) {
-        return multiply((Generic)arithmetic);
-    }
-
-    public Generic divide(@NotNull Arithmetic arithmetic) throws ArithmeticException {
-        return divide((Generic)arithmetic);
-    }*/
 
 	@NotNull
 	public DivideAndRemainderResult divideAndRemainder(@NotNull Generic generic) {
@@ -45,18 +25,22 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 		}
 	}
 
-	public Generic remainder(Generic generic) throws ArithmeticException {
-		return divideAndRemainder(generic).getRemainder();
+	@NotNull
+	public Generic getRemainder(@NotNull Generic that) throws ArithmeticException {
+		return divideAndRemainder(that).getRemainder();
 	}
 
+	@NotNull
+	@Override
 	public Generic inverse() {
-		return GenericInteger.newInstance(1).divide(this);
+		return GenericInteger.ONE.divide(this);
 	}
 
-	public abstract Generic gcd(@NotNull Generic generic);
-
-	public Generic scm(Generic generic) {
-		return divide(gcd(generic)).multiply(generic);
+	@Override
+	@NotNull
+	public Generic scm(@NotNull Generic that) {
+		final Generic gcd = this.gcd(that);
+		return this.divide(gcd).multiply(that);
 	}
 
 	@NotNull
@@ -81,10 +65,12 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 		return gcdAndNormalize()[1];
 	}
 
+	@NotNull
+	@Override
 	public Generic pow(int exponent) {
 		assert exponent >= 0;
 
-		Generic result = GenericInteger.newInstance(1);
+		Generic result = GenericInteger.ONE;
 
 		for (int i = 0; i < exponent; i++) {
 
@@ -96,15 +82,11 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 		return result;
 	}
 
+	@NotNull
+	@Override
 	public Generic abs() {
 		return signum() < 0 ? negate() : this;
 	}
-
-	public abstract Generic negate();
-
-	public abstract int signum();
-
-	public abstract int degree();
 
 	//    public abstract Generic mod(Generic generic);
 //    public abstract Generic modPow(Generic exponent, Generic generic);
@@ -115,16 +97,6 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 	public abstract Generic derivative(@NotNull Variable variable);
 
 	public abstract Generic substitute(@NotNull Variable variable, Generic generic);
-
-	public abstract Generic expand();
-
-	public abstract Generic factorize();
-
-	public abstract Generic elementary();
-
-	public abstract Generic simplify();
-
-	public abstract Generic numeric();
 
 	public abstract Generic newInstance(Generic generic);
 
