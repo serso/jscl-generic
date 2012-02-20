@@ -82,9 +82,9 @@ public class Expression extends Generic {
 		if (that instanceof Expression) {
 			return add((Expression) that);
 		} else if (that instanceof JsclInteger || that instanceof Rational || that instanceof NumericWrapper) {
-			return add(valueOf(that));
+			return add(newInstance(that));
 		} else {
-			return that.valueOf(this).add(that);
+			return that.newInstance(this).add(that);
 		}
 	}
 
@@ -98,9 +98,9 @@ public class Expression extends Generic {
 		if (that instanceof Expression) {
 			return subtract((Expression) that);
 		} else if (that instanceof JsclInteger || that instanceof Rational || that instanceof NumericWrapper) {
-			return subtract(valueOf(that));
+			return subtract(newInstance(that));
 		} else {
-			return that.valueOf(this).subtract(that);
+			return that.newInstance(this).subtract(that);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class Expression extends Generic {
 		if (that instanceof Expression) {
 			return multiply((Expression) that);
 		} else if (that instanceof JsclInteger || that instanceof Rational || that instanceof NumericWrapper) {
-			return multiply(valueOf(that));
+			return multiply(newInstance(that));
 		} else {
 			return that.multiply(this);
 		}
@@ -143,9 +143,9 @@ public class Expression extends Generic {
 		} else if (that instanceof GenericInteger) {
 			return divideAndRemainder((GenericInteger) that);
 		} else if (that instanceof Rational || that instanceof NumericWrapper) {
-			return divideAndRemainder(valueOf(that));
+			return divideAndRemainder(newInstance(that));
 		} else {
-			return that.valueOf(this).divideAndRemainder(that);
+			return that.newInstance(this).divideAndRemainder(that);
 		}
 	}
 
@@ -211,9 +211,9 @@ public class Expression extends Generic {
 				return this.gcd().gcd(generic);
 			}
 		} else if (generic instanceof Rational || generic instanceof NumericWrapper) {
-			return gcd(valueOf(generic));
+			return gcd(newInstance(generic));
 		} else {
-			return generic.valueOf(this).gcd(generic);
+			return generic.newInstance(this).gcd(generic);
 		}
 	}
 
@@ -379,10 +379,10 @@ public class Expression extends Generic {
 	}
 
 	@NotNull
-	public Generic valueOf(@NotNull Generic generic) {
-		final Expression result = newInstance(0);
+	public Expression newInstance(@NotNull Generic generic) {
+		final Builder result = new Builder(1);
 
-		result.init(generic);
+		result.addSummand(Summand.newInstance(GenericInteger.newInstance(1L), Literal.Builder));
 
 		return result;
 	}
@@ -565,9 +565,9 @@ public class Expression extends Generic {
 		if (generic instanceof Expression) {
 			return compareTo((Expression) generic);
 		} else if (generic instanceof JsclInteger || generic instanceof Rational || generic instanceof NumericWrapper) {
-			return compareTo(valueOf(generic));
+			return compareTo(newInstance(generic));
 		} else {
-			return generic.valueOf(this).compareTo(generic);
+			return generic.newInstance(this).compareTo(generic);
 		}
 	}
 

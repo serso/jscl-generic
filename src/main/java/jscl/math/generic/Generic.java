@@ -2,6 +2,8 @@ package jscl.math.generic;
 
 import jscl.math.Arithmetic;
 import jscl.math.NotDivisibleException;
+import jscl.math.NotIntegrableException;
+import jscl.math.Variable;
 import jscl.math.generic.expression.Expression;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
@@ -37,18 +39,18 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 	@NotNull
 	public DivideAndRemainderResult divideAndRemainder(@NotNull Generic generic) {
 		try {
-			return new Generic[]{divide(generic), JsclInteger.valueOf(0)};
+			return DivideAndRemainderResult.newInstance(divide(generic), GenericInteger.newInstance(0));
 		} catch (NotDivisibleException e) {
-			return new Generic[]{JsclInteger.valueOf(0), this};
+			return DivideAndRemainderResult.newInstance(GenericInteger.newInstance(0), this);
 		}
 	}
 
 	public Generic remainder(Generic generic) throws ArithmeticException {
-		return divideAndRemainder(generic)[1];
+		return divideAndRemainder(generic).getRemainder();
 	}
 
 	public Generic inverse() {
-		return JsclInteger.valueOf(1).divide(this);
+		return GenericInteger.newInstance(1).divide(this);
 	}
 
 	public abstract Generic gcd(@NotNull Generic generic);
@@ -82,7 +84,7 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 	public Generic pow(int exponent) {
 		assert exponent >= 0;
 
-		Generic result = JsclInteger.valueOf(1);
+		Generic result = GenericInteger.newInstance(1);
 
 		for (int i = 0; i < exponent; i++) {
 
@@ -124,11 +126,11 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 
 	public abstract Generic numeric();
 
-	public abstract Generic valueOf(Generic generic);
+	public abstract Generic newInstance(Generic generic);
 
 	public abstract Generic[] sumValue();
 
-	public abstract Generic[] productValue() throws NotProductException;
+/*	public abstract Generic[] productValue() throws NotProductException;
 
 	public abstract Power powerValue() throws NotPowerException;
 
@@ -138,7 +140,7 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 
 	public abstract JsclInteger integerValue() throws NotIntegerException;
 
-	public abstract Variable variableValue() throws NotVariableException;
+	public abstract Variable variableValue() throws NotVariableException;*/
 
 	public abstract Variable[] variables();
 
@@ -146,13 +148,13 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable {
 
 	public abstract boolean isConstant(@NotNull Variable variable);
 
-	public boolean isIdentity(@NotNull Variable variable) {
+/*	public boolean isIdentity(@NotNull Variable variable) {
 		try {
 			return variableValue().isIdentity(variable);
 		} catch (NotVariableException e) {
 			return false;
 		}
-	}
+	}*/
 
 	public abstract int compareTo(Generic generic);
 

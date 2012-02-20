@@ -1,7 +1,7 @@
 package jscl.math.generic.expression.literal;
 
 
-import jscl.math.generic.Variable;
+import jscl.math.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
