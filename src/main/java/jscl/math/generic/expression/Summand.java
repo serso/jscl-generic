@@ -30,6 +30,11 @@ class Summand {
     }
 
     @NotNull
+    static Summand newInstance(@NotNull GenericInteger coefficient) {
+        return new Summand(coefficient, Literal.newEmpty());
+    }
+
+    @NotNull
     public Literal getLiteral() {
         return literal;
     }

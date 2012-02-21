@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Set;
 
-public final class GenericInteger extends Generic {
+public final class GenericInteger extends Generic implements Numeral {
 
     public static final GenericInteger ZERO = new GenericInteger(BigInteger.valueOf(0L));
     public static final GenericInteger ONE = new GenericInteger(BigInteger.valueOf(1L));
@@ -328,6 +328,7 @@ public final class GenericInteger extends Generic {
         throw new NotVariableException();
     }
 
+    @NotNull
     public Variable[] variables() {
         return new Variable[0];
     }

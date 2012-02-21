@@ -5,6 +5,8 @@ import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
+
 public abstract class Generic implements Arithmetic<Generic>, Comparable, Transformable, IGeneric<Generic> {
 
     @NotNull
@@ -44,7 +46,7 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     }
 
     @NotNull
-    protected abstract Generic gcd();
+    protected abstract GenericInteger gcd();
 
     public Generic[] gcdAndNormalize() {
         Generic gcd = gcd();
@@ -114,7 +116,8 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
 
 	public abstract Variable variableValue() throws NotVariableException;*/
 
-    public abstract Variable[] variables();
+    @NotNull
+    public abstract Set<Variable> variables();
 
     public abstract boolean isPolynomial(@NotNull Variable variable);
 

@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Set;
 
-public final class Rational extends Generic {
+public final class Rational extends Generic implements Numeral{
 
     @NotNull
     private final BigInteger n;
@@ -354,6 +354,7 @@ public final class Rational extends Generic {
         }
     }
 
+    @NotNull
     public Variable[] variables() {
         return new Variable[0];
     }

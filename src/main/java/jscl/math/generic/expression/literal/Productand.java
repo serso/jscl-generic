@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Date: 2/19/12
  * Time: 12:27 AM
  */
-class Productand {
+public class Productand {
 
     @NotNull
     private final Variable variable;

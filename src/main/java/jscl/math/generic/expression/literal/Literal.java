@@ -4,6 +4,7 @@ import jscl.ImmutableObjectBuilder;
 import jscl.ToJavaWritable;
 import jscl.ToMathMlWritable;
 import jscl.math.NotDivisibleException;
+import jscl.math.Transformable;
 import jscl.math.Variable;
 import jscl.math.generic.Generic;
 import jscl.mathml.MathML;
@@ -18,8 +19,13 @@ import java.util.*;
  */
 public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 
+    private static final Literal EMPTY_LITERAL = new Literal(Collections.<Productand>emptyList());
+
     @NotNull
     private final List<Productand> productands;
+
+    @NotNull
+    private final List<Variable> variables;
 
     private final int degree;
 
@@ -59,16 +65,17 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 
     @NotNull
     public static Literal newEmpty() {
-        //noinspection unchecked
-        return new Literal((List<Productand>) Collections.emptyList());
+        return EMPTY_LITERAL;
     }
 
     private Literal(@NotNull List<Productand> productands) {
         this.productands = productands;
+        this.variables = new ArrayList<Variable>(productands.size());
 
         int degree = 0;
         for (Productand productand : productands) {
             degree += productand.getExponent();
+            variables.add(productand.getVariable());
         }
 
         this.degree = degree;
@@ -77,6 +84,11 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
     @NotNull
     public Productand getProductand(int i) {
         return productands.get(i);
+    }
+
+    @NotNull
+    public List<Variable> getVariables() {
+        return Collections.unmodifiableList(variables);
     }
 
     @NotNull
@@ -202,7 +214,7 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 	}*/
 
     @NotNull
-    public Map<Variable, Generic> content(@NotNull Converter<Variable, Generic> c) {
+    public Map<Variable, Generic> content(@NotNull Converter<Transformable, Generic> c) {
         final Map<Variable, Generic> result = new TreeMap<Variable, Generic>();
 
         for (Productand productand : productands) {
