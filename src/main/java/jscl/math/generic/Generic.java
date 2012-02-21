@@ -110,11 +110,11 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
 
 	public abstract Expression expressionValue() throws NotExpressionException;
 
-	public abstract boolean isInteger();
+	public abstract boolean isInteger();*/
 
-	public abstract JsclInteger integerValue() throws NotIntegerException;
+    public abstract GenericInteger integerValue() throws NotIntegerException;
 
-	public abstract Variable variableValue() throws NotVariableException;*/
+	public abstract Variable variableValue() throws NotVariableException;
 
     @NotNull
     public abstract Set<Variable> variables();

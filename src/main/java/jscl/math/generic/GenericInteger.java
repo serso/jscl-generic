@@ -1,6 +1,7 @@
 package jscl.math.generic;
 
 import jscl.JsclMathEngine;
+import jscl.math.Variable;
 import jscl.math.function.Constant;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;

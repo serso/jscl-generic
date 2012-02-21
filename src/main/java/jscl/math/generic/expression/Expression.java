@@ -81,12 +81,48 @@ public class Expression extends Generic {
     }
 
     @NotNull
-    public Expression newInstance(@NotNull Generic generic) {
-        final Builder result = new Builder(1);
+    public Expression newInstance(@NotNull Generic that) {
+        if (that instanceof Expression) {
+            return (Expression)that;
+        } else if (that instanceof GenericInteger) {
+            return newInstance((GenericInteger)that);
+        } else if (that instanceof Rational) {
+            return newInstance((Rational)that);
+        } else if (that instanceof GenericNumeric) {
+            return newInstance((GenericNumeric)that);
+        } else {
+            throw new ArithmeticException("Could not initialize expression with " + that.getClass());
+        }
+    }
 
-        result.addSummand(Summand.newInstance(GenericInteger.newInstance(1L), ));
+    @NotNull
+    public static Expression newInstance(@NotNull GenericInteger that) {
+        return newInstance0(that);
+    }
 
-        return result;
+    @NotNull
+    public static Expression newInstance(@NotNull Rational that) {
+        return newInstance0(that);
+    }
+
+    @NotNull
+    public static Expression newInstance(@NotNull GenericNumeric that) {
+        return newInstance0(that);
+    }
+
+    @NotNull
+    private static Expression newInstance0(@NotNull Generic that) {
+        if (!that.isZero()) {
+            final Builder b = new Builder(1);
+            try {
+                b.addSummand(Summand.newInstance(that.integerValue()));
+            } catch (NotIntegerException e) {
+                b.addSummand(Summand.newInstance(GenericInteger.ONE, Literal.newInstance(that.variableValue())));
+            }
+            return b.build();
+        } else {
+            return Expression.newEmpty();
+        }
     }
 
     @NotNull
@@ -492,9 +528,9 @@ public class Expression extends Generic {
 
                 Generic b = content.get(variable).pow(productand.getExponent());
 
-                if (Matrix.isMatrixProduct(sumElement, b)) {
+/*                if (Matrix.isMatrixProduct(sumElement, b)) {
                     throw new ArithmeticException("Should not be matrix!");
-                }
+                }*/
 
                 sumElement = sumElement.multiply(b);
             }
@@ -597,9 +633,11 @@ public class Expression extends Generic {
         }
     }
 
+    @NotNull
     public GenericInteger integerValue() throws NotIntegerException {
+        int size = getSize();
         if (size == 0) {
-            return GenericInteger.valueOf(0);
+            return GenericInteger.ZERO;
         } else if (size == 1) {
 
             final Literal l = literals[0];
@@ -726,7 +764,7 @@ public class Expression extends Generic {
 
     @NotNull
     public static Expression valueOf(@NotNull Variable variable) {
-        return valueOf(Literal.valueOf(variable));
+        return valueOf(Literal.newI(variable));
     }
 
     @NotNull
@@ -790,7 +828,7 @@ public class Expression extends Generic {
             throw new ParseException(Messages.msg_1, index, expression, index + 1);
         }
 
-        return new Expression().init(generic);
+        return new Expression().newInstance(generic);
     }
 
     public static Expression init(@NotNull NumericWrapper numericWrapper) {
@@ -817,20 +855,6 @@ public class Expression extends Generic {
         } catch (NotIntegerException e) {
             init(Literal.valueOf(rational.variableValue()), GenericInteger.valueOf(1));
         }
-    }
-
-    Expression init(@NotNull Generic generic) {
-        if (generic instanceof Expression) {
-            init((Expression) generic);
-        } else if (generic instanceof GenericInteger) {
-            init((GenericInteger) generic);
-        } else if (generic instanceof NumericWrapper) {
-            init((NumericWrapper) generic);
-        } else if (generic instanceof Rational) {
-            init((Rational) generic);
-        } else throw new ArithmeticException("Could not initialize expression with " + generic.getClass());
-
-        return this;
     }
 
     public String toString() {

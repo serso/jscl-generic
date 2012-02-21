@@ -29,6 +29,14 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 
     private final int degree;
 
+    /*
+   * *********************************************************************
+   *
+   *                         CONSTRUCTORS
+   *
+   * *********************************************************************
+    */
+
     public static class Builder extends ImmutableObjectBuilder<Literal> {
 
         private final List<Productand> productands;
@@ -68,6 +76,13 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
         return EMPTY_LITERAL;
     }
 
+    @NotNull
+    public static Literal newInstance(@NotNull Variable v) {
+        final Builder b = new Builder(1);
+        b.addProductand(v);
+        return b.build();
+    }
+
     private Literal(@NotNull List<Productand> productands) {
         this.productands = productands;
         this.variables = new ArrayList<Variable>(productands.size());
@@ -80,6 +95,14 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 
         this.degree = degree;
     }
+
+    /*
+   * *********************************************************************
+   *
+   *                         GETTERS
+   *
+   * *********************************************************************
+    */
 
     @NotNull
     public Productand getProductand(int i) {

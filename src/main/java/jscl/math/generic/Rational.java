@@ -344,13 +344,16 @@ public final class Rational extends Generic implements Numeral{
         }
     }
 
+    @NotNull
     public Variable variableValue() throws NotVariableException {
         try {
-            integerValue();
-            throw new NotVariableException();
+            return integerValue().variableValue();
         } catch (NotIntegerException e) {
-            if (n.compareTo(BigInteger.valueOf(1)) == 0) return new Inverse(new GenericInteger(d));
-            else return new Fraction(new GenericInteger(n), new GenericInteger(d));
+            if (n.compareTo(BigInteger.ONE) == 0) {
+                return new Inverse(new GenericInteger(d));
+            } else {
+                return new Fraction(new GenericInteger(n), new GenericInteger(d));
+            }
         }
     }
 
@@ -411,6 +414,11 @@ public final class Rational extends Generic implements Numeral{
             e1.appendChild(e2);
             element.appendChild(e1);
         }
+    }
+
+    @Override
+    public boolean isZero() {
+        return d.compareTo(BigInteger.ZERO) == 0;
     }
 
     @NotNull
