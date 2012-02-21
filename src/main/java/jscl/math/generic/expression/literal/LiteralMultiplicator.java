@@ -10,42 +10,42 @@ import org.jetbrains.annotations.NotNull;
  */
 enum LiteralMultiplicator {
 
-	instance;
+    instance;
 
-	@NotNull
-	public Literal multiply(@NotNull Literal l, @NotNull Literal r) {
-		final Literal.Builder result = new Literal.Builder(l.getSize() + r.getSize());
+    @NotNull
+    public Literal multiply(@NotNull Literal l, @NotNull Literal r) {
+        final Literal.Builder result = new Literal.Builder(l.getSize() + r.getSize());
 
-		final MutableInt li = new MutableInt();
-		final MutableInt ri = new MutableInt();
+        final MutableInt li = new MutableInt();
+        final MutableInt ri = new MutableInt();
 
-		Productand lp = LiteralUtils.getNext(l, li);
-		Productand rp = LiteralUtils.getNext(r, ri);
+        Productand lp = LiteralUtils.getNext(l, li);
+        Productand rp = LiteralUtils.getNext(r, ri);
 
-		while (lp != null || rp != null) {
-			final int c = LiteralUtils.compare(lp, rp);
+        while (lp != null || rp != null) {
+            final int c = LiteralUtils.compare(lp, rp);
 
-			if (c < 0) {
-				assert lp != null;
+            if (c < 0) {
+                assert lp != null;
 
-				result.addProductand(lp);
-				lp = LiteralUtils.getNext(l, li);
-			} else if (c > 0) {
-				assert rp != null;
+                result.addProductand(lp);
+                lp = LiteralUtils.getNext(l, li);
+            } else if (c > 0) {
+                assert rp != null;
 
-				result.addProductand(rp);
-				rp = LiteralUtils.getNext(r, ri);
-			} else {
-				assert lp != null;
-				assert rp != null;
+                result.addProductand(rp);
+                rp = LiteralUtils.getNext(r, ri);
+            } else {
+                assert lp != null;
+                assert rp != null;
 
-				result.addProductand(lp.getVariable(), lp.getExponent() + rp.getExponent());
+                result.addProductand(lp.getVariable(), lp.getExponent() + rp.getExponent());
 
-				lp = LiteralUtils.getNext(l, li);
-				rp = LiteralUtils.getNext(r, ri);
-			}
-		}
+                lp = LiteralUtils.getNext(l, li);
+                rp = LiteralUtils.getNext(r, ri);
+            }
+        }
 
-		return result.build();
-	}
+        return result.build();
+    }
 }

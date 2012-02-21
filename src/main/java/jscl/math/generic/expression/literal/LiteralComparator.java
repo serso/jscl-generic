@@ -12,38 +12,38 @@ import java.util.Comparator;
  */
 enum LiteralComparator implements Comparator<Literal> {
 
-	instance;
+    instance;
 
-	public int compare(@NotNull Literal l, @NotNull Literal r) {
-		final MutableInt li = new MutableInt(l.getSize());
-		final MutableInt ri = new MutableInt(r.getSize());
+    public int compare(@NotNull Literal l, @NotNull Literal r) {
+        final MutableInt li = new MutableInt(l.getSize());
+        final MutableInt ri = new MutableInt(r.getSize());
 
-		Productand lp = LiteralUtils.getPrev(l, li);
-		Productand rp = LiteralUtils.getPrev(r, ri);
+        Productand lp = LiteralUtils.getPrev(l, li);
+        Productand rp = LiteralUtils.getPrev(r, ri);
 
-		while (lp != null || rp != null) {
-			int c = LiteralUtils.compare(lp, rp);
+        while (lp != null || rp != null) {
+            int c = LiteralUtils.compare(lp, rp);
 
-			if (c == 0) {
+            if (c == 0) {
 
-				assert lp != null;
-				assert rp != null;
+                assert lp != null;
+                assert rp != null;
 
-				if (lp.getExponent() < rp.getExponent()) {
-					return -1;
-				} else if (lp.getExponent() > rp.getExponent()) {
-					return 1;
-				} else {
-					lp = LiteralUtils.getPrev(l, li);
-					rp = LiteralUtils.getPrev(r, ri);
-				}
+                if (lp.getExponent() < rp.getExponent()) {
+                    return -1;
+                } else if (lp.getExponent() > rp.getExponent()) {
+                    return 1;
+                } else {
+                    lp = LiteralUtils.getPrev(l, li);
+                    rp = LiteralUtils.getPrev(r, ri);
+                }
 
-			} else {
-				return c;
-			}
+            } else {
+                return c;
+            }
 
-		}
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 }

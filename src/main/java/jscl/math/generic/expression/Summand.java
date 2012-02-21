@@ -11,36 +11,36 @@ import org.jetbrains.annotations.NotNull;
  */
 class Summand {
 
-	@NotNull
-	private final Literal literal;
+    @NotNull
+    private final Literal literal;
 
-	@NotNull
-	private final GenericInteger coefficient;
+    @NotNull
+    private final GenericInteger coefficient;
 
-	private Summand(@NotNull GenericInteger coefficient,
-					@NotNull Literal literal) {
-		this.coefficient = coefficient;
-		this.literal = literal;
-	}
+    private Summand(@NotNull GenericInteger coefficient,
+                    @NotNull Literal literal) {
+        this.coefficient = coefficient;
+        this.literal = literal;
+    }
 
-	@NotNull
-	static Summand newInstance(@NotNull GenericInteger coefficient,
-							   @NotNull Literal literal) {
-		return new Summand(coefficient, literal);
-	}
+    @NotNull
+    static Summand newInstance(@NotNull GenericInteger coefficient,
+                               @NotNull Literal literal) {
+        return new Summand(coefficient, literal);
+    }
 
-	@NotNull
-	public Literal getLiteral() {
-		return literal;
-	}
+    @NotNull
+    public Literal getLiteral() {
+        return literal;
+    }
 
-	@NotNull
-	public GenericInteger getCoefficient() {
-		return coefficient;
-	}
+    @NotNull
+    public GenericInteger getCoefficient() {
+        return coefficient;
+    }
 
-	@NotNull
-	public Summand multiply(@NotNull Summand that) {
-		return newInstance(this.coefficient.multiply(that.coefficient), this.literal.multiply(that.literal));
-	}
+    @NotNull
+    public Summand multiply(@NotNull Summand that) {
+        return newInstance(this.coefficient.multiply(that.coefficient), this.literal.multiply(that.literal));
+    }
 }

@@ -9,28 +9,28 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface IGeneric<G extends IGeneric<G>> {
 
-	@NotNull
-	G inverse();
+    @NotNull
+    G inverse();
 
-	@NotNull
-	G gcd(@NotNull G that);
+    @NotNull
+    G gcd(@NotNull G that);
 
-	@NotNull
-	G scm(@NotNull G that);
+    @NotNull
+    G scm(@NotNull G that);
 
-	int signum();
+    int signum();
 
-	@NotNull
-	G pow(int exponent);
+    @NotNull
+    G pow(int exponent);
 
-	@NotNull
-	G abs();
+    @NotNull
+    G abs();
 
-	@NotNull
-	G negate();
+    @NotNull
+    G negate();
 
-	int degree();
+    int degree();
 
-	@NotNull
-	G valueOf(@NotNull G that);
+    @NotNull
+    G valueOf(@NotNull G that);
 }

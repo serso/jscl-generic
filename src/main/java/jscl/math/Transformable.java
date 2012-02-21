@@ -11,58 +11,58 @@ import org.solovyev.common.utils.Converter;
  */
 public interface Transformable {
 
-	@NotNull
-	Generic expand();
+    @NotNull
+    Generic expand();
 
-	@NotNull
-	Generic factorize();
+    @NotNull
+    Generic factorize();
 
-	@NotNull
-	Generic elementary();
+    @NotNull
+    Generic elementary();
 
-	@NotNull
-	Generic simplify();
+    @NotNull
+    Generic simplify();
 
-	@NotNull
-	Generic numeric();
+    @NotNull
+    Generic numeric();
 
-	public static final Converter<Transformable, Generic> FACTORIZE_CONVERTER = new Converter<Transformable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Transformable from) {
-			return from.factorize();
-		}
-	};
+    public static final Converter<Transformable, Generic> FACTORIZE_CONVERTER = new Converter<Transformable, Generic>() {
+        @NotNull
+        @Override
+        public Generic convert(@NotNull Transformable from) {
+            return from.factorize();
+        }
+    };
 
-	public static final Converter<Transformable, Generic> ELEMENTARY_CONVERTER = new Converter<Transformable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Transformable from) {
-			return from.elementary();
-		}
-	};
+    public static final Converter<Transformable, Generic> ELEMENTARY_CONVERTER = new Converter<Transformable, Generic>() {
+        @NotNull
+        @Override
+        public Generic convert(@NotNull Transformable from) {
+            return from.elementary();
+        }
+    };
 
-	public static final Converter<Transformable, Generic> EXPAND_CONVERTER = new Converter<Transformable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Transformable from) {
-			return from.expand();
-		}
-	};
+    public static final Converter<Transformable, Generic> EXPAND_CONVERTER = new Converter<Transformable, Generic>() {
+        @NotNull
+        @Override
+        public Generic convert(@NotNull Transformable from) {
+            return from.expand();
+        }
+    };
 
-	public static final Converter<Transformable, Generic> NUMERIC_CONVERTER = new Converter<Transformable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Transformable from) {
-			return from.numeric();
-		}
-	};
+    public static final Converter<Transformable, Generic> NUMERIC_CONVERTER = new Converter<Transformable, Generic>() {
+        @NotNull
+        @Override
+        public Generic convert(@NotNull Transformable from) {
+            return from.numeric();
+        }
+    };
 
-	public static final Converter<Transformable, Generic> SIMPLIFY_CONVERTER = new Converter<Transformable, Generic>() {
-		@NotNull
-		@Override
-		public Generic convert(@NotNull Transformable from) {
-			return from.simplify();
-		}
-	};
+    public static final Converter<Transformable, Generic> SIMPLIFY_CONVERTER = new Converter<Transformable, Generic>() {
+        @NotNull
+        @Override
+        public Generic convert(@NotNull Transformable from) {
+            return from.simplify();
+        }
+    };
 }

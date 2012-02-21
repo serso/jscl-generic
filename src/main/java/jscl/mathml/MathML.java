@@ -19,64 +19,64 @@ import java.io.ByteArrayOutputStream;
 
 public class MathML {
 
-	private static Transformer xhtml;
+    private static Transformer xhtml;
 
-	@NotNull
-	private final Node node;
+    @NotNull
+    private final Node node;
 
-	private MathML(@NotNull Node node) {
-		this.node = node;
-	}
+    private MathML(@NotNull Node node) {
+        this.node = node;
+    }
 
-	@Nullable
-	public Document getDocument() {
-		return node instanceof CoreDocumentImpl ? (Document) node : node.getOwnerDocument();
-	}
+    @Nullable
+    public Document getDocument() {
+        return node instanceof CoreDocumentImpl ? (Document) node : node.getOwnerDocument();
+    }
 
-	public MathML(@NotNull String qualifiedName,
-				  @NotNull String publicId,
-				  @NotNull String systemId) {
-		final CoreDocumentImpl document = new CoreDocumentImpl();
-		document.setXmlEncoding("utf-8");
-		document.appendChild(new DocumentTypeImpl(document, qualifiedName, publicId, systemId));
+    public MathML(@NotNull String qualifiedName,
+                  @NotNull String publicId,
+                  @NotNull String systemId) {
+        final CoreDocumentImpl document = new CoreDocumentImpl();
+        document.setXmlEncoding("utf-8");
+        document.appendChild(new DocumentTypeImpl(document, qualifiedName, publicId, systemId));
 
-		this.node = document;
-	}
+        this.node = document;
+    }
 
-	@NotNull
-	public MathML newElement(@NotNull String name) {
-		final CoreDocumentImpl document = (CoreDocumentImpl) getDocument();
-		return new MathML(new ElementImpl(document, name));
-	}
+    @NotNull
+    public MathML newElement(@NotNull String name) {
+        final CoreDocumentImpl document = (CoreDocumentImpl) getDocument();
+        return new MathML(new ElementImpl(document, name));
+    }
 
-	public void setAttribute(@NotNull String name, 
-							 @NotNull String value) {
-		((Element) node).setAttribute(name, value);
-	}
+    public void setAttribute(@NotNull String name,
+                             @NotNull String value) {
+        ((Element) node).setAttribute(name, value);
+    }
 
-	@NotNull
-	public MathML newText(@NotNull String data) {
-		CoreDocumentImpl document = (CoreDocumentImpl) getDocument();
-		return new MathML(new TextImpl(document, data));
-	}
+    @NotNull
+    public MathML newText(@NotNull String data) {
+        CoreDocumentImpl document = (CoreDocumentImpl) getDocument();
+        return new MathML(new TextImpl(document, data));
+    }
 
-	public void appendChild(@NotNull MathML math) {
-		node.appendChild(math.node);
-	}
+    public void appendChild(@NotNull MathML math) {
+        node.appendChild(math.node);
+    }
 
-	public String toString() {
-		final ByteArrayOutputStream os = new ByteArrayOutputStream();
-		try {
-			getTransformer().transform(new DOMSource(node), new StreamResult(os));
-		} catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
-		String s = os.toString();
-		return s.substring(s.indexOf(">") + 1);
-	}
+    public String toString() {
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            getTransformer().transform(new DOMSource(node), new StreamResult(os));
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
+        String s = os.toString();
+        return s.substring(s.indexOf(">") + 1);
+    }
 
-	@NotNull
-	private static synchronized Transformer getTransformer() throws TransformerException {
-		return xhtml == null ? xhtml = TransformerFactory.newInstance().newTransformer() : xhtml;
-	}
+    @NotNull
+    private static synchronized Transformer getTransformer() throws TransformerException {
+        return xhtml == null ? xhtml = TransformerFactory.newInstance().newTransformer() : xhtml;
+    }
 }

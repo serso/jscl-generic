@@ -10,11 +10,11 @@ import org.solovyev.common.msg.Message;
  */
 public class NotIntegrableException extends AbstractJsclArithmeticException {
 
-	public NotIntegrableException(@org.jetbrains.annotations.NotNull String messageCode, Object... parameters) {
-		super(messageCode, parameters);
-	}
+    public NotIntegrableException(@org.jetbrains.annotations.NotNull String messageCode, Object... parameters) {
+        super(messageCode, parameters);
+    }
 
-	public NotIntegrableException(@org.jetbrains.annotations.NotNull Message message) {
-		super(message);
-	}
+    public NotIntegrableException(@org.jetbrains.annotations.NotNull Message message) {
+        super(message);
+    }
 }

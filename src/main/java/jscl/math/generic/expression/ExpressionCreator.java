@@ -10,6 +10,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ExpressionCreator {
 
-	@NotNull
-	Expression newExpression(@NotNull Generic generic);
+    @NotNull
+    Expression newExpression(@NotNull Generic generic);
 }

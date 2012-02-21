@@ -11,5 +11,5 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ToMathMlWritable {
 
-	void toMathML(@NotNull MathML parent, @Nullable Object data);
+    void toMathML(@NotNull MathML parent, @Nullable Object data);
 }

@@ -6,84 +6,83 @@ import jscl.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.solovyev.common.math.MathEntity;
-import org.solovyev.common.utils.Converter;
 import org.solovyev.common.utils.StringUtils;
 
-import java.util.*;
+import java.util.Comparator;
 
 public abstract class Variable implements Comparable<Variable>, MathEntity, Transformable {
 
-	@NotNull
-	public static final Comparator<Variable> comparator = VariableComparator.instance;
+    @NotNull
+    public static final Comparator<Variable> comparator = VariableComparator.instance;
 
-	private Integer id;
+    private Integer id;
 
-	@NotNull
-	protected String name;
+    @NotNull
+    protected String name;
 
-	private boolean system = true;
+    private boolean system = true;
 
-	public Variable(@NotNull String name) {
-		this.name = name;
-	}
+    public Variable(@NotNull String name) {
+        this.name = name;
+    }
 
-	@NotNull
-	@Override
-	public Integer getId() {
-		return id;
-	}
+    @NotNull
+    @Override
+    public Integer getId() {
+        return id;
+    }
 
-	@Override
-	public boolean isIdDefined() {
-		return id != null;
-	}
+    @Override
+    public boolean isIdDefined() {
+        return id != null;
+    }
 
-	public void setId(@NotNull Integer id) {
-		this.id = id;
-	}
+    public void setId(@NotNull Integer id) {
+        this.id = id;
+    }
 
-	@NotNull
-	public final String getName() {
-		return name;
-	}
+    @NotNull
+    public final String getName() {
+        return name;
+    }
 
-	public boolean isSystem() {
-		return system;
-	}
+    public boolean isSystem() {
+        return system;
+    }
 
-	protected void setSystem(boolean system) {
-		this.system = system;
-	}
+    protected void setSystem(boolean system) {
+        this.system = system;
+    }
 
-	public void copy(@NotNull MathEntity that) {
-		if (that instanceof Variable) {
-			this.name = ((Variable) that).name;
-		}
-	}
+    public void copy(@NotNull MathEntity that) {
+        if (that instanceof Variable) {
+            this.name = ((Variable) that).name;
+        }
+    }
 
-	public abstract Generic antiDerivative(Variable variable) throws NotIntegrableException;
+    public abstract Generic antiDerivative(Variable variable) throws NotIntegrableException;
 
-	@NotNull
-	public abstract Generic derivative(Variable variable);
+    @NotNull
+    public abstract Generic derivative(Variable variable);
 
-	public abstract Generic substitute(Variable variable, Generic generic);
+    public abstract Generic substitute(Variable variable, Generic generic);
 
-	/*	@NotNull
-   public Expression expressionValue() {
-	   return Expression.valueOf(this);
-   }*/
+    /*	@NotNull
+    public Expression expressionValue() {
+        return Expression.valueOf(this);
+    }*/
 
-	public abstract boolean isConstant(Variable variable);
+    public abstract boolean isConstant(Variable variable);
 
-	public boolean isIdentity(@NotNull Variable variable) {
-		return this.compareTo(variable) == 0;
-	}
+    public boolean isIdentity(@NotNull Variable variable) {
+        return this.compareTo(variable) == 0;
+    }
 
-	public abstract int compareTo(Variable variable);
+    public abstract int compareTo(Variable variable);
 
-	public boolean equals(Object obj) {
-		return obj instanceof Variable && compareTo((Variable) obj) == 0;
-	}
+    public boolean equals(Object obj) {
+        return obj instanceof Variable && compareTo((Variable) obj) == 0;
+    }
 
 /*	public static Variable valueOf(String str) throws ParseException, NotVariableException {
 		return Expression.valueOf(str).variableValue();
@@ -96,36 +95,36 @@ public abstract class Variable implements Comparable<Variable>, MathEntity, Tran
 		return var;
 	}*/
 
-	public String toString() {
-		return name;
-	}
+    public String toString() {
+        return name;
+    }
 
-	public String toJava() {
-		return name;
-	}
+    public String toJava() {
+        return name;
+    }
 
-	public void toMathML(@NotNull MathML parent, @Nullable Object data) {
-		int exponent = data instanceof Integer ? (Integer) data : 1;
-		if (exponent == 1) {
-			nameToMathML(parent);
-		} else {
-			final MathML e1 = parent.newElement("msup");
-			nameToMathML(e1);
-			final MathML e2 = parent.newElement("mn");
-			e2.appendChild(parent.newText(String.valueOf(exponent)));
-			e1.appendChild(e2);
-			parent.appendChild(e1);
-		}
-	}
+    public void toMathML(@NotNull MathML parent, @Nullable Object data) {
+        int exponent = data instanceof Integer ? (Integer) data : 1;
+        if (exponent == 1) {
+            nameToMathML(parent);
+        } else {
+            final MathML e1 = parent.newElement("msup");
+            nameToMathML(e1);
+            final MathML e2 = parent.newElement("mn");
+            e2.appendChild(parent.newText(String.valueOf(exponent)));
+            e1.appendChild(e2);
+            parent.appendChild(e1);
+        }
+    }
 
-	private void nameToMathML(@NotNull MathML element) {
-		final MathML e1 = element.newElement("mi");
-		e1.appendChild(element.newText(StringUtils.getNotEmpty(TextUtils.getGreekMappings().get(name), name)));
-		element.appendChild(e1);
-	}
+    private void nameToMathML(@NotNull MathML element) {
+        final MathML e1 = element.newElement("mi");
+        e1.appendChild(element.newText(StringUtils.getNotEmpty(TextUtils.getGreekMappings().get(name), name)));
+        element.appendChild(e1);
+    }
 
-	@NotNull
-	public abstract Variable newInstance();
+    @NotNull
+    public abstract Variable newInstance();
 /*
 	@NotNull
 	public abstract Set<? extends Constant> getConstants();*/

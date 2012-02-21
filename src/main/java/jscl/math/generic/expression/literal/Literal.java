@@ -1,8 +1,8 @@
 package jscl.math.generic.expression.literal;
 
 import jscl.ImmutableObjectBuilder;
-import jscl.ToMathMlWritable;
 import jscl.ToJavaWritable;
+import jscl.ToMathMlWritable;
 import jscl.math.NotDivisibleException;
 import jscl.math.Variable;
 import jscl.math.generic.Generic;
@@ -18,95 +18,95 @@ import java.util.*;
  */
 public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 
-	@NotNull
-	private final List<Productand> productands;
+    @NotNull
+    private final List<Productand> productands;
 
-	private final int degree;
+    private final int degree;
 
-	public static class Builder extends ImmutableObjectBuilder<Literal> {
+    public static class Builder extends ImmutableObjectBuilder<Literal> {
 
-		private final List<Productand> productands;
+        private final List<Productand> productands;
 
-		public Builder(int initialCapacity) {
-			this.productands = new ArrayList<Productand>(initialCapacity);
-		}
+        public Builder(int initialCapacity) {
+            this.productands = new ArrayList<Productand>(initialCapacity);
+        }
 
-		public void addProductand(@NotNull Productand p) {
-			if (isLocked()) {
-				throw new IllegalStateException("Cannot add productand to already created expression!");
-			}
-			this.productands.add(p);
-		}
+        public void addProductand(@NotNull Productand p) {
+            if (isLocked()) {
+                throw new IllegalStateException("Cannot add productand to already created expression!");
+            }
+            this.productands.add(p);
+        }
 
-		public void addProductand(@NotNull Variable variable, int exponent) {
-			addProductand(Productand.newInstance(variable, exponent));
-		}
+        public void addProductand(@NotNull Variable variable, int exponent) {
+            addProductand(Productand.newInstance(variable, exponent));
+        }
 
-		public void addProductand(@NotNull Variable variable) {
-			addProductand(Productand.newInstance(variable));
-		}
+        public void addProductand(@NotNull Variable variable) {
+            addProductand(Productand.newInstance(variable));
+        }
 
-		@NotNull
-		public Literal build0() {
-			// avoid not used memory
-			if (productands instanceof ArrayList) {
-				((ArrayList) productands).trimToSize();
-			}
+        @NotNull
+        public Literal build0() {
+            // avoid not used memory
+            if (productands instanceof ArrayList) {
+                ((ArrayList) productands).trimToSize();
+            }
 
-			return new Literal(productands);
-		}
-	}
+            return new Literal(productands);
+        }
+    }
 
-	@NotNull
-	public static Literal newEmpty() {
-		//noinspection unchecked
-		return new Literal((List<Productand>) Collections.emptyList());
-	}
+    @NotNull
+    public static Literal newEmpty() {
+        //noinspection unchecked
+        return new Literal((List<Productand>) Collections.emptyList());
+    }
 
-	private Literal(@NotNull List<Productand> productands) {
-		this.productands = productands;
+    private Literal(@NotNull List<Productand> productands) {
+        this.productands = productands;
 
-		int degree = 0;
-		for (Productand productand : productands) {
-			degree += productand.getExponent();
-		}
+        int degree = 0;
+        for (Productand productand : productands) {
+            degree += productand.getExponent();
+        }
 
-		this.degree = degree;
-	}
+        this.degree = degree;
+    }
 
-	@NotNull
-	public Productand getProductand(int i) {
-		return productands.get(i);
-	}
+    @NotNull
+    public Productand getProductand(int i) {
+        return productands.get(i);
+    }
 
-	@NotNull
-	public List<Productand> getProductands() {
-		return Collections.unmodifiableList(productands);
-	}
+    @NotNull
+    public List<Productand> getProductands() {
+        return Collections.unmodifiableList(productands);
+    }
 
-	public int getSize() {
-		return this.productands.size();
-	}
+    public int getSize() {
+        return this.productands.size();
+    }
 
-	@NotNull
-	public Literal multiply(@NotNull Literal that) {
-		return LiteralMultiplicator.instance.multiply(this, that);
-	}
+    @NotNull
+    public Literal multiply(@NotNull Literal that) {
+        return LiteralMultiplicator.instance.multiply(this, that);
+    }
 
-	@NotNull
-	public Literal divide(@NotNull Literal that) throws NotDivisibleException {
-		return LiteralDivider.instance.divide(this, that);
-	}
+    @NotNull
+    public Literal divide(@NotNull Literal that) throws NotDivisibleException {
+        return LiteralDivider.instance.divide(this, that);
+    }
 
-	@NotNull
-	public Literal gcd(@NotNull Literal that) {
-		return LiteralGcd.instance.gcd(this, that);
-	}
+    @NotNull
+    public Literal gcd(@NotNull Literal that) {
+        return LiteralGcd.instance.gcd(this, that);
+    }
 
-	@NotNull
-	public Literal lcm(@NotNull Literal that) {
-		return LiteralLcm.instance.lcm(this, that);
-	}
+    @NotNull
+    public Literal lcm(@NotNull Literal that) {
+        return LiteralLcm.instance.lcm(this, that);
+    }
 
 /*	public Generic[] productValue() throws NotProductException {
 		Generic a[] = new Generic[size];
@@ -139,17 +139,17 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 		return va;
 	}*/
 
-	public int getDegree() {
-		return degree;
-	}
+    public int getDegree() {
+        return degree;
+    }
 
-	public int compareTo(@NotNull Literal that) {
-		return LiteralComparator.instance.compare(this, that);
-	}
+    public int compareTo(@NotNull Literal that) {
+        return LiteralComparator.instance.compare(this, that);
+    }
 
-	public int compareTo(Object o) {
-		return compareTo((Literal) o);
-	}
+    public int compareTo(Object o) {
+        return compareTo((Literal) o);
+    }
 /*
 
 	public static Literal newInstance() {
@@ -201,94 +201,94 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
 		}
 	}*/
 
-	@NotNull
-	public Map<Variable, Generic> content(@NotNull Converter<Variable, Generic> c) {
-		final Map<Variable, Generic> result = new TreeMap<Variable, Generic>();
+    @NotNull
+    public Map<Variable, Generic> content(@NotNull Converter<Variable, Generic> c) {
+        final Map<Variable, Generic> result = new TreeMap<Variable, Generic>();
 
-		for (Productand productand : productands) {
-			final Variable variable = productand.getVariable();
-			if (!result.containsKey(variable)) {
-				result.put(variable, c.convert(variable));
-			}
-		}
+        for (Productand productand : productands) {
+            final Variable variable = productand.getVariable();
+            if (!result.containsKey(variable)) {
+                result.put(variable, c.convert(variable));
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	public String toString() {
-		final StringBuilder result = new StringBuilder();
+    public String toString() {
+        final StringBuilder result = new StringBuilder();
 
-		if (degree == 0) {
-			result.append("1");
-		} else {
-			// result = var[0] ^ power[0] * var[1] ^ power[1]* ...
-			for (int i = 0; i < getSize(); i++) {
-				if (i > 0) {
-					result.append("*");
-				}
+        if (degree == 0) {
+            result.append("1");
+        } else {
+            // result = var[0] ^ power[0] * var[1] ^ power[1]* ...
+            for (int i = 0; i < getSize(); i++) {
+                if (i > 0) {
+                    result.append("*");
+                }
 
-				final Productand productand = getProductand(i);
-				final int exponent = productand.getExponent();
-				final Variable v = productand.getVariable();
+                final Productand productand = getProductand(i);
+                final int exponent = productand.getExponent();
+                final Variable v = productand.getVariable();
 
-				if (exponent == 1) {
-					result.append(v);
-				} else {
-					// todo serso: uncomment code below if no additional brackets are needed
-					//if (v instanceof Fraction || v instanceof Pow) {
-					result.append("(").append(v).append(")");
-					//} else {
-					//	result.append(v);
-					//}
-					result.append("^").append(exponent);
-				}
-			}
-		}
+                if (exponent == 1) {
+                    result.append(v);
+                } else {
+                    // todo serso: uncomment code below if no additional brackets are needed
+                    //if (v instanceof Fraction || v instanceof Pow) {
+                    result.append("(").append(v).append(")");
+                    //} else {
+                    //	result.append(v);
+                    //}
+                    result.append("^").append(exponent);
+                }
+            }
+        }
 
-		return result.toString();
-	}
+        return result.toString();
+    }
 
-	@Override
-	@NotNull
-	public String toJava() {
-		final StringBuilder result = new StringBuilder();
-		if (degree == 0) {
-			result.append("JsclDouble.valueOf(1)");
-		} else {
-			for (int i = 0; i < getSize(); i++) {
-				if (i > 0) {
-					result.append(".multiply(");
-				}
+    @Override
+    @NotNull
+    public String toJava() {
+        final StringBuilder result = new StringBuilder();
+        if (degree == 0) {
+            result.append("JsclDouble.valueOf(1)");
+        } else {
+            for (int i = 0; i < getSize(); i++) {
+                if (i > 0) {
+                    result.append(".multiply(");
+                }
 
-				final Productand productand = getProductand(i);
-				final int exponent = productand.getExponent();
-				final Variable v = productand.getVariable();
+                final Productand productand = getProductand(i);
+                final int exponent = productand.getExponent();
+                final Variable v = productand.getVariable();
 
-				result.append(v.toJava());
-				if (exponent != 1) {
-					result.append(".pow(").append(exponent).append(")");
-				}
+                result.append(v.toJava());
+                if (exponent != 1) {
+                    result.append(".pow(").append(exponent).append(")");
+                }
 
-				if (i > 0) {
-					result.append(")");
-				}
-			}
-		}
-		return result.toString();
-	}
+                if (i > 0) {
+                    result.append(")");
+                }
+            }
+        }
+        return result.toString();
+    }
 
-	@Override
-	public void toMathML(@NotNull MathML parent, @Nullable Object data) {
-		if (degree == 0) {
-			final MathML child = parent.newElement("mn");
-			child.appendChild(parent.newElement("1"));
-			parent.appendChild(child);
-		} else {
-			for (int i = 0; i < getSize(); i++) {
-				final Productand productand = getProductand(i);
-				productand.getVariable().toMathML(parent, productand.getExponent());
-			}
-		}
+    @Override
+    public void toMathML(@NotNull MathML parent, @Nullable Object data) {
+        if (degree == 0) {
+            final MathML child = parent.newElement("mn");
+            child.appendChild(parent.newElement("1"));
+            parent.appendChild(child);
+        } else {
+            for (int i = 0; i < getSize(); i++) {
+                final Productand productand = getProductand(i);
+                productand.getVariable().toMathML(parent, productand.getExponent());
+            }
+        }
 
-	}
+    }
 }

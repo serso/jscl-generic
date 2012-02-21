@@ -9,6 +9,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ToJavaWritable {
 
-	@NotNull
-	String toJava();
+    @NotNull
+    String toJava();
 }
