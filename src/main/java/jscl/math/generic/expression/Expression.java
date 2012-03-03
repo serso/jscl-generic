@@ -129,8 +129,8 @@ public class Expression extends Generic implements Iterable<Summand> {
     }
 
     @NotNull
-    private static Expression newEmpty(@NotNull GenericContext context) {
-        return context.newEmptyExpression();
+    public static Expression newEmpty(@NotNull GenericContext context) {
+        return new Expression(Collections.<Summand>emptyList(), context);
     }
 
     /*
@@ -507,7 +507,7 @@ public class Expression extends Generic implements Iterable<Summand> {
             //Generic a = ((UnivariatePolynomial) Polynomial.factory(v).valueOf(this)).derivative(variable).genericValue();
             //result = result.add(a);
         }
-        
+
         return result;
     }
 
@@ -705,7 +705,7 @@ public class Expression extends Generic implements Iterable<Summand> {
         for (Variable lv : l.getVariables()) {
             if (!lv.isConstant(variable)) {
                 return false;
-            }            
+            }
         }
 
         return true;
@@ -820,11 +820,11 @@ public class Expression extends Generic implements Iterable<Summand> {
 
         // result = coef[0] * literal[0] + coef[1] * literal[1] + ... +
         boolean first = true;
-        for (Summand summand : summands) {            
+        for (Summand summand : summands) {
             final Literal literal = summand.getLiteral();
             final GenericInteger coefficient = summand.getCoefficient();
 
-            if (coefficient.signum() > 0 && first) {
+            if (coefficient.signum() > 0 && !first) {
                 result.append("+");
             }
 
@@ -840,7 +840,7 @@ public class Expression extends Generic implements Iterable<Summand> {
                 }
                 result.append(literal);
             }
-            
+
             first = false;
         }
 
@@ -871,7 +871,7 @@ public class Expression extends Generic implements Iterable<Summand> {
                 } else result.append(en.toJava()).append(".multiply(").append(l.toJava()).append(")");
             }
             if (first) result.append(")");
-            
+
             first = false;
         }
 
@@ -885,7 +885,7 @@ public class Expression extends Generic implements Iterable<Summand> {
             e2.appendChild(element.newText("0"));
             e1.appendChild(e2);
         }
-        
+
         boolean first = true;
         for (Summand summand : summands) {
             Literal l = summand.getLiteral();
@@ -906,7 +906,7 @@ public class Expression extends Generic implements Iterable<Summand> {
                 } else separateSign(e1, en);
                 l.toMathML(e1, null);
             }
-            
+
             first = false;
         }
         element.appendChild(e1);
@@ -914,17 +914,16 @@ public class Expression extends Generic implements Iterable<Summand> {
 
     @Override
     public boolean isZero() {
-        // todo serso: check
-        if ( getSize() == 0 ) {
+        if (getSize() == 0) {
             return true;
         } else {
             for (Summand summand : summands) {
-                if ( !summand.isZero() ) {
+                if (!summand.isZero()) {
                     return false;
                 }
-            }        
+            }
             return true;
-        }        
+        }
     }
 
 /*	@NotNull

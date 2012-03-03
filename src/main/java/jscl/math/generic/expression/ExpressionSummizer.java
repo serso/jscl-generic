@@ -24,8 +24,8 @@ enum ExpressionSummizer {
     public Expression sum(@NotNull Expression l, @Nullable Summand lMultiplier, @NotNull Expression r, @Nullable Summand rMultiplier) {
         final Expression.Builder result = new Expression.Builder(l.getContext(), l.getSize() + r.getSize());
 
-        final MutableInt li = new MutableInt(l.getSize());
-        final MutableInt ri = new MutableInt(r.getSize());
+        final MutableInt li = new MutableInt(l.getSize() - 1);
+        final MutableInt ri = new MutableInt(r.getSize() - 1);
 
         final List<Summand> lSummands = l.getSummands();
         final List<Summand> rSummands = r.getSummands();
@@ -75,7 +75,7 @@ enum ExpressionSummizer {
     @Nullable
     private Summand getNext(@NotNull List<Summand> list, @NotNull MutableInt i, @Nullable Summand multiplier) {
         int intValue = i.intValue();
-        if (intValue > 0) {
+        if (intValue > 0 ) {
             final Summand result = list.get(intValue);
             i.decrement();
             if (multiplier != null) {

@@ -33,12 +33,17 @@ public final class GenericInteger extends Generic implements Numeral {
     @NotNull
     public static GenericInteger newInstance(long value, @NotNull GenericContext context) {
         if (value == 0L) {
-            return context.getZero();
+            return new GenericInteger(BigInteger.ZERO, context);
         } else if (value == 1L) {
-            return context.getOne();
+            return new GenericInteger(BigInteger.ONE, context);
         } else {
-            return context.newInteger(value);
+            return new GenericInteger(BigInteger.valueOf(value), context);
         }
+    }
+
+    @NotNull
+    public static GenericInteger newInstance(@NotNull BigInteger value, @NotNull GenericContext context) {
+        return new GenericInteger(value, context);
     }
 
     /*
@@ -443,9 +448,7 @@ public final class GenericInteger extends Generic implements Numeral {
     }
 
     public String toString() {
-        // todo serso: actually better way is to provide custom format() method for integers and not to convert integer to double
-        throw new UnsupportedOperationException();
-        //return JsclMathEngine.instance.format(this.content.doubleValue());
+        return context.format(this.content);
     }
 
     public String toJava() {

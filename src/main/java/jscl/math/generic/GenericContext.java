@@ -12,7 +12,7 @@ import java.math.BigInteger;
  * Date: 3/3/12
  * Time: 4:53 PM
  */
-public interface GenericContext {
+public interface  GenericContext {
 
     @NotNull
     String format(@NotNull BigInteger intValue) throws NumeralBaseException;
@@ -22,7 +22,6 @@ public interface GenericContext {
 
     @NotNull
     Expression newEmptyExpression();
-    //new Expression(Collections.<Summand>emptyList(), context)
 
     @NotNull
     GenericInteger getZero();
