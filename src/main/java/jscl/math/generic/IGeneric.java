@@ -29,8 +29,6 @@ public interface IGeneric<G extends IGeneric<G>> {
     @NotNull
     G negate();
 
-    int degree();
-
     @NotNull
     G valueOf(@NotNull G that);
 }

@@ -6,6 +6,7 @@ import jscl.math.Variable;
 import jscl.math.generic.expression.Expression;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -19,6 +20,12 @@ public final class Rational extends Generic implements Numeral {
 
     @NotNull
     private final BigInteger d;
+
+    // cached value for fast access
+    // if current rational cannot be reduced (reducing yields the same rational number) no new object is created
+    @Nullable
+    private Rational reducedValue;
+
 
     /*
      *
@@ -183,12 +190,17 @@ public final class Rational extends Generic implements Numeral {
 
     @NotNull
     private Rational reduce() {
-        BigInteger gcd = n.gcd(d);
-        if (gcd.signum() != d.signum()) {
-            gcd = gcd.negate();
+        Rational result = reducedValue;
+        if (result == null) {
+            BigInteger gcd = n.gcd(d);
+            if (gcd.signum() != d.signum()) {
+                gcd = gcd.negate();
+            }
+
+            reducedValue = (result = gcd.signum() == 0 ? this : new Rational(n.divide(gcd), d.divide(gcd), context));
         }
 
-        return gcd.signum() == 0 ? this : new Rational(n.divide(gcd), d.divide(gcd), context);
+        return result;
     }
 
     @NotNull
@@ -226,13 +238,17 @@ public final class Rational extends Generic implements Numeral {
         return i1.multiply(i2).divide(i1.gcd(i2));
     }
 
+    // just returns numerator as rational number can be divided with no remainder but its numerator
     @NotNull
     public GenericInteger getIntegerGcd() {
-        return null;
+        return context.newInteger(n);
     }
 
     @NotNull
     public Generic pow(int exponent) {
+        if ( exponent < 0 ) {
+            throw new IllegalArgumentException("Exponent must be positive");
+        } 
         return new Rational(n.pow(exponent), d.pow(exponent), context);
     }
 
@@ -245,10 +261,6 @@ public final class Rational extends Generic implements Numeral {
         return n.signum();
     }
 
-    public int degree() {
-        return 0;
-    }
-
     public Generic antiDerivative(@NotNull Variable variable) throws NotIntegrableException {
         return multiply(variable.asGeneric());
     }
@@ -259,11 +271,6 @@ public final class Rational extends Generic implements Numeral {
 
     public Generic substitute(@NotNull Variable variable, Generic generic) {
         return this;
-    }
-
-    @Override
-    public Generic newInstance(@NotNull Generic generic) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @NotNull
@@ -353,7 +360,12 @@ public final class Rational extends Generic implements Numeral {
         if (d.compareTo(BigInteger.ONE) == 0) {
             return context.newInteger(n);
         } else {
-            throw new NotIntegerException();
+            final Rational reduced = reduce();
+            if ( reduced.getDenominator().compareTo(BigInteger.ONE) == 0 ) {
+                return context.newInteger(reduced.getNumerator());
+            } else {
+                throw new NotIntegerException();
+            }
         }
     }
 

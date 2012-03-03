@@ -30,8 +30,8 @@ enum ExpressionSummizer {
         final List<Summand> lSummands = l.getSummands();
         final List<Summand> rSummands = r.getSummands();
 
-        Summand ls = getNext(lSummands, li, lMultiplier);
-        Summand rs = getNext(rSummands, ri, rMultiplier);
+        Summand ls = getPrev(lSummands, li, lMultiplier);
+        Summand rs = getPrev(rSummands, ri, rMultiplier);
 
         while (ls != null || rs != null) {
             int c;
@@ -48,12 +48,12 @@ enum ExpressionSummizer {
                 assert ls != null;
 
                 result.addSummand(ls);
-                ls = getNext(lSummands, li, lMultiplier);
+                ls = getPrev(lSummands, li, lMultiplier);
             } else if (c > 0) {
                 assert rs != null;
 
                 result.addSummand(rs);
-                rs = getNext(rSummands, ri, rMultiplier);
+                rs = getPrev(rSummands, ri, rMultiplier);
             } else {
                 assert rs != null;
                 assert ls != null;
@@ -64,8 +64,8 @@ enum ExpressionSummizer {
                     result.addSummand(coefficient, ls.getLiteral());
                 }
 
-                ls = getNext(lSummands, li, lMultiplier);
-                rs = getNext(rSummands, ri, rMultiplier);
+                ls = getPrev(lSummands, li, lMultiplier);
+                rs = getPrev(rSummands, ri, rMultiplier);
             }
         }
 
@@ -73,9 +73,9 @@ enum ExpressionSummizer {
     }
 
     @Nullable
-    private Summand getNext(@NotNull List<Summand> list, @NotNull MutableInt i, @Nullable Summand multiplier) {
+    private Summand getPrev(@NotNull List<Summand> list, @NotNull MutableInt i, @Nullable Summand multiplier) {
         int intValue = i.intValue();
-        if (intValue > 0 ) {
+        if (intValue >= 0 ) {
             final Summand result = list.get(intValue);
             i.decrement();
             if (multiplier != null) {

@@ -53,7 +53,7 @@ public class GenericNumeric extends Generic{
     }
 
     @Override
-    public Generic newInstance(@NotNull Generic generic) {
+    public Generic valueOf(@NotNull Generic generic) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -147,17 +147,6 @@ public class GenericNumeric extends Generic{
     @NotNull
     @Override
     public Generic negate() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public int degree() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @NotNull
-    @Override
-    public Generic valueOf(@NotNull Generic that) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

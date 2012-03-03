@@ -25,16 +25,6 @@ public class Expression extends Generic implements Iterable<Summand> {
     @Nullable
     private Literal literalLcm;
 
-    @Override
-    public Iterator<Summand> iterator() {
-        return this.summands.iterator();
-    }
-
-    @NotNull
-    public Summand getSummand(int i) {
-        return this.summands.get(i);
-    }
-
     /*
    * *********************************************************************
    *
@@ -84,7 +74,7 @@ public class Expression extends Generic implements Iterable<Summand> {
     }
 
     @NotNull
-    public Expression newInstance(@NotNull Generic that) {
+    public Expression valueOf(@NotNull Generic that) {
         if (that instanceof Expression) {
             return (Expression) that;
         } else if (that instanceof GenericInteger) {
@@ -141,6 +131,11 @@ public class Expression extends Generic implements Iterable<Summand> {
    * *********************************************************************
     */
 
+    @Override
+    public Iterator<Summand> iterator() {
+        return this.summands.iterator();
+    }
+
     public int getSize() {
         return this.summands.size();
     }
@@ -148,6 +143,11 @@ public class Expression extends Generic implements Iterable<Summand> {
     @NotNull
     public List<Summand> getSummands() {
         return Collections.unmodifiableList(summands);
+    }
+
+    @NotNull
+    public Summand getSummand(int i) {
+        return this.summands.get(i);
     }
 
     /*
@@ -189,7 +189,7 @@ public class Expression extends Generic implements Iterable<Summand> {
         } else if (that instanceof GenericNumeric) {
             return add((GenericNumeric) that);
         } else {
-            return that.newInstance(this).add(that);
+            return that.valueOf(this).add(that);
         }
     }
 
@@ -232,7 +232,7 @@ public class Expression extends Generic implements Iterable<Summand> {
         } else if (that instanceof GenericNumeric) {
             return subtract((GenericNumeric) that);
         } else {
-            return that.newInstance(this).subtract(that);
+            return that.valueOf(this).subtract(that);
         }
     }
 
@@ -295,17 +295,17 @@ public class Expression extends Generic implements Iterable<Summand> {
 
     @NotNull
     public Generic divide(@NotNull Generic that) throws NotDivisibleException {
-        final DivideAndRemainderResult darr = divideAndRemainder(that);
+        final DivisionResult darr = divideAndRemainder(that);
         if (darr.getRemainder().isZero()) {
             // remainder 0 => can be divided
-            return darr.getDivisionResult();
+            return darr.getQuotient();
         } else {
             throw new NotDivisibleException();
         }
     }
 
     @NotNull
-    public DivideAndRemainderResult divideAndRemainder(@NotNull Generic that) throws ArithmeticException {
+    public DivisionResult divideAndRemainder(@NotNull Generic that) throws ArithmeticException {
         if (that instanceof Expression) {
             return divideAndRemainder((Expression) that);
         } else if (that instanceof GenericInteger) {
@@ -315,35 +315,35 @@ public class Expression extends Generic implements Iterable<Summand> {
         } else if (that instanceof GenericNumeric) {
             return divideAndRemainder((GenericNumeric) that);
         } else {
-            return that.newInstance(this).divideAndRemainder(that);
+            return that.valueOf(this).divideAndRemainder(that);
         }
     }
 
     @NotNull
-    public DivideAndRemainderResult divideAndRemainder(@NotNull GenericInteger that) {
+    public DivisionResult divideAndRemainder(@NotNull GenericInteger that) {
         try {
             final Builder b = new Builder(context, this.getSize());
             for (Summand summand : summands) {
                 b.addSummand(summand.getCoefficient().divide(that), summand.getLiteral());
             }
-            return DivideAndRemainderResult.newInstance(b.build(), context.getZero());
+            return DivisionResult.newInstance(b.build(), context.getZero());
         } catch (NotDivisibleException e) {
-            return DivideAndRemainderResult.newInstance(context.getZero(), this);
+            return DivisionResult.newInstance(context.getZero(), this);
         }
     }
 
     @NotNull
-    public DivideAndRemainderResult divideAndRemainder(@NotNull Rational that) {
+    public DivisionResult divideAndRemainder(@NotNull Rational that) {
         return divideAndRemainder(newInstance(that));
     }
 
     @NotNull
-    public DivideAndRemainderResult divideAndRemainder(@NotNull GenericNumeric that) {
+    public DivisionResult divideAndRemainder(@NotNull GenericNumeric that) {
         return divideAndRemainder(newInstance(that));
     }
 
     @NotNull
-    private DivideAndRemainderResult divideAndRemainder(@NotNull Expression that) {
+    private DivisionResult divideAndRemainder(@NotNull Expression that) {
         Literal thisLiteral = this.literalLcm();
         Literal thatLiteral = that.literalLcm();
 
@@ -352,12 +352,12 @@ public class Expression extends Generic implements Iterable<Summand> {
         final List<Variable> variables = gcd.getVariables();
         if (variables.size() == 0) {
             if (this.signum() == 0 && that.signum() != 0) {
-                return DivideAndRemainderResult.newInstance(this, context.getZero());
+                return DivisionResult.newInstance(this, context.getZero());
             } else {
                 try {
                     return divideAndRemainder((Generic) that.integerValue());
                 } catch (NotIntegerException e) {
-                    return DivideAndRemainderResult.newInstance(context.getZero(), this);
+                    return DivisionResult.newInstance(context.getZero(), this);
                 }
             }
         } else {
@@ -379,20 +379,30 @@ public class Expression extends Generic implements Iterable<Summand> {
     */
 
     @NotNull
-    public Generic gcd(@NotNull Generic generic) {
-        if (generic instanceof Expression) {
-            return ExpressionGcd.instance.gcd(this, (Expression) generic);
-        } else if (generic instanceof GenericInteger) {
-            if (generic.signum() == 0) {
-                return this;
-            } else {
-                return this.getIntegerGcd().gcd(generic);
-            }
-        } else if (generic instanceof Rational || generic instanceof GenericNumeric) {
-            return gcd(newInstance(generic));
+    public Generic gcd(@NotNull Generic that) {
+        if (that instanceof Expression) {
+            return gcd((Expression) that);
+        } else if (that instanceof GenericInteger) {
+            return gcd((GenericInteger)that);
+        } else if (that instanceof Rational || that instanceof GenericNumeric) {
+            return gcd(valueOf(that));
         } else {
-            return generic.newInstance(this).gcd(generic);
+            return that.valueOf(this).gcd(that);
         }
+    }
+
+    @NotNull
+    public Generic gcd(@NotNull GenericInteger that) {
+        if (that.signum() == 0) {
+            return this;
+        } else {
+            return this.getIntegerGcd().gcd(that);
+        }
+    }
+
+    @NotNull
+    public Generic gcd(@NotNull Expression that) {
+        return ExpressionGcd.instance.gcd(this, that);
     }
 
     @NotNull
@@ -439,16 +449,6 @@ public class Expression extends Generic implements Iterable<Summand> {
 
     public int signum() {
         return getSize() == 0 ? 0 : summands.get(0).getCoefficient().signum();
-    }
-
-    public int degree() {
-        return 0;
-    }
-
-    @NotNull
-    @Override
-    public Generic valueOf(@NotNull Generic that) {
-        return newInstance(that);
     }
 
     public Generic antiDerivative(@NotNull Variable v) throws NotIntegrableException {
@@ -501,7 +501,7 @@ public class Expression extends Generic implements Iterable<Summand> {
     public Generic derivative(@NotNull Variable variable) {
         Generic result = context.getZero();
 
-        for (Productand productand : literalLcm()) {
+        for (Productand productand : literalLcm().getProductands()) {
             Variable v = productand.getVariable();
             throw new UnsupportedOperationException();
             //Generic a = ((UnivariatePolynomial) Polynomial.factory(v).valueOf(this)).derivative(variable).genericValue();
@@ -735,9 +735,9 @@ public class Expression extends Generic implements Iterable<Summand> {
         if (generic instanceof Expression) {
             return compareTo((Expression) generic);
         } else if (generic instanceof GenericInteger || generic instanceof Rational || generic instanceof GenericNumeric) {
-            return compareTo(newInstance(generic));
+            return compareTo(valueOf(generic));
         } else {
-            return generic.newInstance(this).compareTo(generic);
+            return generic.valueOf(this).compareTo(generic);
         }
     }
 

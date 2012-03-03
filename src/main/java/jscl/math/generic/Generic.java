@@ -31,11 +31,11 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     }
 
     @NotNull
-    public DivideAndRemainderResult divideAndRemainder(@NotNull Generic generic) {
+    public DivisionResult divideAndRemainder(@NotNull Generic generic) {
         try {
-            return DivideAndRemainderResult.newInstance(divide(generic), context.getZero());
+            return DivisionResult.newInstance(divide(generic), context.getZero());
         } catch (NotDivisibleException e) {
-            return DivideAndRemainderResult.newInstance(context.getZero(), this);
+            return DivisionResult.newInstance(context.getZero(), this);
         }
     }
 
@@ -85,7 +85,9 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     @NotNull
     @Override
     public Generic pow(int exponent) {
-        assert exponent >= 0;
+        if ( exponent < 0 ) {
+            throw new IllegalArgumentException("Exponent must be positive");
+        }
 
         Generic result = context.getOne();
 
@@ -114,8 +116,6 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     public abstract Generic derivative(@NotNull Variable variable);
 
     public abstract Generic substitute(@NotNull Variable variable, Generic generic);
-
-    public abstract Generic newInstance(@NotNull Generic generic);
 
     @NotNull
     public abstract List<? extends Generic> sumValue();

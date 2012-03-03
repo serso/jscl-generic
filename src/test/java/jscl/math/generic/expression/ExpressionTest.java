@@ -19,9 +19,7 @@ public class ExpressionTest {
     public void testAdd() throws Exception {
         final Expression one = Expression.newInstance(context.newInteger(1));
 
-        Assert.assertEquals("1", one.toString());
-        Assert.assertEquals("2", one.add(one).toString());
-
-        Assert.assertEquals(one.multiply(context.newInteger(2)), one.add(one));
+        Assert.assertEquals("1.0", one.toString());
+        Assert.assertEquals("2.0", one.add(one).toString());
     }
 }
