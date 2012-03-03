@@ -1,62 +1,87 @@
 package jscl.math.generic;
 
-import jscl.JsclMathEngine;
+import jscl.math.NotDivisibleException;
+import jscl.math.NotIntegrableException;
 import jscl.math.Variable;
-import jscl.math.function.Constant;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 public final class GenericInteger extends Generic implements Numeral {
-
-    public static final GenericInteger ZERO = new GenericInteger(BigInteger.valueOf(0L));
-    public static final GenericInteger ONE = new GenericInteger(BigInteger.valueOf(1L));
 
     @NotNull
     private final BigInteger content;
 
-    private GenericInteger(@NotNull BigInteger content) {
+    /*
+    **********************************************************************
+    *
+    *                           CONSTRUCTORS
+    *
+    **********************************************************************
+    */
+
+    private GenericInteger(@NotNull BigInteger content, @NotNull GenericContext context) {
+        super(context);
         this.content = content;
     }
+
+    @NotNull
+    public static GenericInteger newInstance(long value, @NotNull GenericContext context) {
+        if (value == 0L) {
+            return context.getZero();
+        } else if (value == 1L) {
+            return context.getOne();
+        } else {
+            return context.newInteger(value);
+        }
+    }
+
+    /*
+    **********************************************************************
+    *
+    *                           GETTERS
+    *
+    **********************************************************************
+    */
+
 
     @NotNull
     public BigInteger getContent() {
         return content;
     }
+    
+    /*
+    **********************************************************************
+    *
+    *                           OTHER
+    *
+    **********************************************************************
+    */
 
     public boolean isZero() {
         return this.content.compareTo(BigInteger.ZERO) == 0;
     }
 
-    @NotNull
-    public static GenericInteger newInstance(long value) {
-        if (value == 0L) {
-            return ZERO;
-        } else if (value == 1L) {
-            return ONE;
-        } else {
-            return new GenericInteger(BigInteger.valueOf(value));
-        }
+    public boolean isOne() {
+        return this.content.compareTo(BigInteger.ONE) == 0;
     }
-
-    public static GenericInteger valueOf(long val) {
-        switch ((int) val) {
-            case 0:
-                return ZERO;
-            case 1:
-                return ONE;
-            default:
-                return new GenericInteger(BigInteger.valueOf(val));
-        }
-    }
+    
+    /*
+    **********************************************************************
+    *
+    *                           ADDITION
+    *
+    **********************************************************************
+    */
 
     @NotNull
     public GenericInteger add(@NotNull GenericInteger that) {
-        return new GenericInteger(content.add(that.content));
+        return new GenericInteger(content.add(that.content), context);
     }
 
     @NotNull
@@ -67,9 +92,17 @@ public final class GenericInteger extends Generic implements Numeral {
             return that.valueOf(this).add(that);
         }
     }
+    
+    /*
+    **********************************************************************
+    *
+    *                           SUBTRACTION
+    *
+    **********************************************************************
+    */
 
     public GenericInteger subtract(GenericInteger integer) {
-        return new GenericInteger(content.subtract(integer.content));
+        return new GenericInteger(content.subtract(integer.content), context);
     }
 
     @NotNull
@@ -80,9 +113,17 @@ public final class GenericInteger extends Generic implements Numeral {
             return that.valueOf(this).subtract(that);
         }
     }
+    
+    /*
+    **********************************************************************
+    *
+    *                           MULTIPLICATION
+    *
+    **********************************************************************
+    */
 
     public GenericInteger multiply(GenericInteger integer) {
-        return new GenericInteger(content.multiply(integer.content));
+        return new GenericInteger(content.multiply(integer.content), context);
     }
 
     @NotNull
@@ -93,11 +134,19 @@ public final class GenericInteger extends Generic implements Numeral {
             return that.multiply(this);
         }
     }
+    
+    /*
+    **********************************************************************
+    *
+    *                           DIVISION
+    *
+    **********************************************************************
+    */
 
     public GenericInteger divide(@NotNull GenericInteger that) {
-        GenericInteger e[] = divideAndRemainder(that);
-        if (e[1].signum() == 0) {
-            return e[0];
+        final DivideAndRemainderResult<GenericInteger> dadr = divideAndRemainder(that);
+        if (dadr.getRemainder().isZero()) {
+            return dadr.getDivisionResult();
         } else {
             throw new NotDivisibleException();
         }
@@ -113,17 +162,17 @@ public final class GenericInteger extends Generic implements Numeral {
     }
 
     @NotNull
-    private GenericInteger[] divideAndRemainder(@NotNull GenericInteger that) {
+    private DivideAndRemainderResult<GenericInteger> divideAndRemainder(@NotNull GenericInteger that) {
         try {
             final BigInteger result[] = content.divideAndRemainder(that.content);
-            return new GenericInteger[]{new GenericInteger(result[0]), new GenericInteger(result[1])};
+            return DivideAndRemainderResult.newInstance(new GenericInteger(result[0], context), new GenericInteger(result[1], context));
         } catch (ArithmeticException e) {
             throw new NotDivisibleException();
         }
     }
 
     @NotNull
-    public Generic[] divideAndRemainder(@NotNull Generic that) {
+    public DivideAndRemainderResult divideAndRemainder(@NotNull Generic that) {
         if (that instanceof GenericInteger) {
             return divideAndRemainder((GenericInteger) that);
         } else {
@@ -132,7 +181,7 @@ public final class GenericInteger extends Generic implements Numeral {
     }
 
     public GenericInteger remainder(GenericInteger integer) throws ArithmeticException {
-        return new GenericInteger(content.remainder(integer.content));
+        return new GenericInteger(content.remainder(integer.content), context);
     }
 
     @NotNull
@@ -140,13 +189,21 @@ public final class GenericInteger extends Generic implements Numeral {
         if (that instanceof GenericInteger) {
             return remainder((GenericInteger) that);
         } else {
-            return that.valueOf(this).remainder(that);
+            return that.valueOf(this).getRemainder(that);
         }
     }
+    
+    /*
+    **********************************************************************
+    *
+    *                           GCD
+    *
+    **********************************************************************
+    */
 
     @NotNull
     public GenericInteger gcd(@NotNull GenericInteger integer) {
-        return new GenericInteger(content.gcd(integer.content));
+        return new GenericInteger(content.gcd(integer.content), context);
     }
 
     @NotNull
@@ -159,18 +216,26 @@ public final class GenericInteger extends Generic implements Numeral {
     }
 
     @NotNull
-    public Generic gcd() {
-        return new GenericInteger(BigInteger.valueOf(signum()));
+    public GenericInteger getIntegerGcd() {
+        return new GenericInteger(BigInteger.valueOf(signum()), context);
     }
 
+    /*
+    **********************************************************************
+    *
+    *                           OTHER OPERATIONS
+    *
+    **********************************************************************
+    */
+    
     @NotNull
     public Generic pow(int exponent) {
-        return new GenericInteger(content.pow(exponent));
+        return new GenericInteger(content.pow(exponent), context);
     }
 
     @NotNull
-    public Generic negate() {
-        return new GenericInteger(content.negate());
+    public GenericInteger negate() {
+        return new GenericInteger(content.negate(), context);
     }
 
     public int signum() {
@@ -182,27 +247,27 @@ public final class GenericInteger extends Generic implements Numeral {
     }
 
     public GenericInteger mod(GenericInteger integer) {
-        return new GenericInteger(content.mod(integer.content));
+        return new GenericInteger(content.mod(integer.content), context);
     }
 
     public GenericInteger modPow(GenericInteger exponent, GenericInteger integer) {
-        return new GenericInteger(content.modPow(exponent.content, integer.content));
+        return new GenericInteger(content.modPow(exponent.content, integer.content), context);
     }
 
     public GenericInteger modInverse(GenericInteger integer) {
-        return new GenericInteger(content.modInverse(integer.content));
+        return new GenericInteger(content.modInverse(integer.content), context);
     }
 
-    public GenericInteger phi() {
+/*    public GenericInteger phi() {
         if (signum() == 0) return this;
         Generic a = factorize();
         Generic p[] = a.productValue();
-        Generic s = GenericInteger.valueOf(1);
+        Generic s = GenericInteger.newInstance(1);
         for (int i = 0; i < p.length; i++) {
             Power o = p[i].powerValue();
             Generic q = o.value(true);
             int c = o.exponent();
-            s = s.multiply(q.subtract(GenericInteger.valueOf(1)).multiply(q.pow(c - 1)));
+            s = s.multiply(q.subtract(GenericInteger.newInstance(1)).multiply(q.pow(c - 1)));
         }
         return s.integerValue();
     }
@@ -217,18 +282,18 @@ public final class GenericInteger extends Generic implements Numeral {
         }
         int k = 0;
         GenericInteger n = this;
-        GenericInteger m = GenericInteger.valueOf(1);
+        GenericInteger m = GenericInteger.newInstance(1);
         GenericInteger r[] = new GenericInteger[phi.phi().intValue()];
         while (m.compareTo(n) < 0) {
-            boolean b = m.gcd(n).compareTo(GenericInteger.valueOf(1)) == 0;
+            boolean b = m.gcd(n).compareTo(GenericInteger.newInstance(1)) == 0;
             for (int i = 0; i < d.length; i++) {
-                b = b && m.modPow(d[i], n).compareTo(GenericInteger.valueOf(1)) > 0;
+                b = b && m.modPow(d[i], n).compareTo(GenericInteger.newInstance(1)) > 0;
             }
             if (b) r[k++] = m;
-            m = m.add(GenericInteger.valueOf(1));
+            m = m.add(GenericInteger.newInstance(1));
         }
         return k > 0 ? r : new GenericInteger[0];
-    }
+    }*/
 
     public GenericInteger sqrt() {
         return nthrt(2);
@@ -237,34 +302,42 @@ public final class GenericInteger extends Generic implements Numeral {
     public GenericInteger nthrt(int n) {
 //      return JsclInteger.valueOf((int)Math.pow((double)intValue(),1./n));
         if (signum() == 0) {
-            return GenericInteger.valueOf(0);
+            return GenericInteger.newInstance(0, this.context);
         } else if (signum() < 0) {
             if (n % 2 == 0) {
                 throw new ArithmeticException("Could not calculate root of negative argument: " + this + " of odd order: " + n);
             } else {
-                return (GenericInteger) ((GenericInteger) negate()).nthrt(n).negate();
+                return negate().nthrt(n).negate();
             }
         } else {
             Generic x0;
             Generic x = this;
             do {
                 x0 = x;
-                x = divideAndRemainder(x.pow(n - 1))[0].add(x.multiply(GenericInteger.valueOf(n - 1))).divideAndRemainder(GenericInteger.valueOf(n))[0];
+                x = divideAndRemainder(x.pow(n - 1)).getDivisionResult().add(x.multiply(GenericInteger.newInstance(n - 1, this.context))).divideAndRemainder(GenericInteger.newInstance(n, this.context)).getDivisionResult();
             } while (x.compareTo(x0) < 0);
             return x0.integerValue();
         }
     }
 
+    @NotNull
     public Generic antiDerivative(@NotNull Variable variable) throws NotIntegrableException {
-        return multiply(variable.expressionValue());
+        return multiply(variable.asGeneric());
     }
 
+    @NotNull
     public Generic derivative(@NotNull Variable variable) {
-        return GenericInteger.valueOf(0);
+        return GenericInteger.newInstance(0, this.context);
     }
 
+    @NotNull
     public Generic substitute(@NotNull Variable variable, Generic generic) {
         return this;
+    }
+
+    @Override
+    public Generic newInstance(@NotNull Generic generic) {
+        throw new ArithmeticException();
     }
 
     @NotNull
@@ -274,7 +347,8 @@ public final class GenericInteger extends Generic implements Numeral {
 
     @NotNull
     public Generic factorize() {
-        return Factorization.compute(this);
+        throw new UnsupportedOperationException();
+        //return Factorization.compute(this);
     }
 
     @NotNull
@@ -289,49 +363,59 @@ public final class GenericInteger extends Generic implements Numeral {
 
     @NotNull
     public Generic numeric() {
-        return new NumericWrapper(this);
+        return GenericNumeric.newInstance(this);
     }
 
     @NotNull
     public Generic valueOf(@NotNull Generic generic) {
-        return new GenericInteger(((GenericInteger) generic).content);
+        return new GenericInteger(((GenericInteger) generic).content, context);
     }
 
-    public Generic[] sumValue() {
-        if (content.signum() == 0) return new Generic[0];
-        else return new Generic[]{this};
+    @NotNull
+    public List<GenericInteger> sumValue() {
+        if ( isZero() ) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(this);
+        }
     }
 
-    public Generic[] productValue() throws NotProductException {
-        if (content.compareTo(BigInteger.valueOf(1)) == 0) return new Generic[0];
-        else return new Generic[]{this};
+    @NotNull
+    public List<GenericInteger> productValue() throws NotProductException {
+        if (isOne()) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(this);
+        }
     }
 
-    public Power powerValue() throws NotPowerException {
+/*    public Power powerValue() throws NotPowerException {
         if (content.signum() < 0) throw new NotPowerException();
         else return new Power(this, 1);
     }
 
     public Expression expressionValue() throws NotExpressionException {
         return Expression.valueOf(this);
-    }
+    }*/
 
+    @NotNull
     public GenericInteger integerValue() throws NotIntegerException {
         return this;
     }
 
-    @Override
+/*    @Override
     public boolean isInteger() {
         return true;
-    }
+    }*/
 
+    @NotNull
     public Variable variableValue() throws NotVariableException {
         throw new NotVariableException();
     }
 
     @NotNull
-    public Variable[] variables() {
-        return new Variable[0];
+    public List<Variable> variables() {
+        return Collections.emptyList();
     }
 
     public boolean isPolynomial(@NotNull Variable variable) {
@@ -346,26 +430,22 @@ public final class GenericInteger extends Generic implements Numeral {
         return content.intValue();
     }
 
-    public int compareTo(GenericInteger integer) {
-        return content.compareTo(integer.content);
+    public int compareTo(@NotNull GenericInteger that) {
+        return content.compareTo(that.content);
     }
 
-    public int compareTo(Generic generic) {
-        if (generic instanceof GenericInteger) {
-            return compareTo((GenericInteger) generic);
+    public int compareTo(@NotNull Generic that) {
+        if (that instanceof GenericInteger) {
+            return compareTo((GenericInteger) that);
         } else {
-            return generic.valueOf(this).compareTo(generic);
+            return that.valueOf(this).compareTo(that);
         }
-    }
-
-
-    public static GenericInteger valueOf(String str) {
-        return new GenericInteger(new BigInteger(str));
     }
 
     public String toString() {
         // todo serso: actually better way is to provide custom format() method for integers and not to convert integer to double
-        return JsclMathEngine.instance.format(this.content.doubleValue());
+        throw new UnsupportedOperationException();
+        //return JsclMathEngine.instance.format(this.content.doubleValue());
     }
 
     public String toJava() {
@@ -376,24 +456,24 @@ public final class GenericInteger extends Generic implements Numeral {
         int exponent = data instanceof Integer ? (Integer) data : 1;
         if (exponent == 1) bodyToMathML(element);
         else {
-            MathML e1 = element.element("msup");
+            MathML e1 = element.newElement("msup");
             bodyToMathML(e1);
-            MathML e2 = element.element("mn");
-            e2.appendChild(element.text(String.valueOf(exponent)));
+            MathML e2 = element.newElement("mn");
+            e2.appendChild(element.newText(String.valueOf(exponent)));
             e1.appendChild(e2);
             element.appendChild(e1);
         }
     }
 
-    @NotNull
+/*    @NotNull
     @Override
     public Set<? extends Constant> getConstants() {
         return Collections.emptySet();
-    }
+    }*/
 
     void bodyToMathML(MathML element) {
-        MathML e1 = element.element("mn");
-        e1.appendChild(element.text(String.valueOf(content)));
+        MathML e1 = element.newElement("mn");
+        e1.appendChild(element.newText(String.valueOf(content)));
         element.appendChild(e1);
     }
 }

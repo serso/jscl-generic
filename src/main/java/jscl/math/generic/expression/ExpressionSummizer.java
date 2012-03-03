@@ -22,7 +22,7 @@ enum ExpressionSummizer {
     }
 
     public Expression sum(@NotNull Expression l, @Nullable Summand lMultiplier, @NotNull Expression r, @Nullable Summand rMultiplier) {
-        final Expression.Builder result = new Expression.Builder(l.getSize() + r.getSize());
+        final Expression.Builder result = new Expression.Builder(l.getContext(), l.getSize() + r.getSize());
 
         final MutableInt li = new MutableInt(l.getSize());
         final MutableInt ri = new MutableInt(r.getSize());

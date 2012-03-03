@@ -1,7 +1,8 @@
 package jscl.math;
 
 import jscl.AbstractJsclArithmeticException;
-import org.solovyev.common.msg.Message;
+import jscl.math.generic.Generic;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * User: serso
@@ -10,11 +11,8 @@ import org.solovyev.common.msg.Message;
  */
 public class NotIntegrableException extends AbstractJsclArithmeticException {
 
-    public NotIntegrableException(@org.jetbrains.annotations.NotNull String messageCode, Object... parameters) {
-        super(messageCode, parameters);
+    public NotIntegrableException(@NotNull Generic g, @NotNull Variable v) {
+        super("not integrable");
     }
 
-    public NotIntegrableException(@org.jetbrains.annotations.NotNull Message message) {
-        super(message);
-    }
 }

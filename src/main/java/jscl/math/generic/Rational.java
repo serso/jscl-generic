@@ -3,18 +3,16 @@ package jscl.math.generic;
 import jscl.math.NotDivisibleException;
 import jscl.math.NotIntegrableException;
 import jscl.math.Variable;
-import jscl.math.function.Constant;
-import jscl.math.function.Fraction;
-import jscl.math.function.Inverse;
 import jscl.math.generic.expression.Expression;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
-public final class Rational extends Generic implements Numeral{
+public final class Rational extends Generic implements Numeral {
 
     @NotNull
     private final BigInteger n;
@@ -31,26 +29,30 @@ public final class Rational extends Generic implements Numeral{
      * */
 
     private Rational(@NotNull BigInteger numerator,
-                     @NotNull BigInteger denominator) {
+                     @NotNull BigInteger denominator,
+                     @NotNull GenericContext context) {
+        super(context);
         this.n = numerator;
         this.d = denominator;
     }
 
     @NotNull
     public static Rational newInstance(@NotNull BigInteger numerator,
-                                       @NotNull BigInteger denominator) {
-        return new Rational(numerator, denominator);
+                                       @NotNull BigInteger denominator,
+                                       @NotNull GenericContext context) {
+        return new Rational(numerator, denominator, context);
     }
 
     @NotNull
-    public static Rational newInstance(@NotNull BigInteger numerator) {
-        return new Rational(numerator, BigInteger.ONE);
+    public static Rational newInstance(@NotNull BigInteger numerator, @NotNull GenericContext context) {
+        return new Rational(numerator, BigInteger.ONE, context);
     }
 
     @NotNull
     public static Rational newInstance(long numerator,
-                                       long denominator) {
-        return new Rational(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator));
+                                       long denominator,
+                                       @NotNull GenericContext context) {
+        return new Rational(BigInteger.valueOf(numerator), BigInteger.valueOf(denominator), context);
     }
 
     /*
@@ -92,7 +94,7 @@ public final class Rational extends Generic implements Numeral{
         // t1 * gcd * t2 = t1 * d2
         // => ( n1 * t2 ) / (t2 * d1) + ( n2 * t1 ) / (t1 * d2) = (n1 * t2 + n2 * t1) / (d1 * t2)
 
-        return new Rational(n.multiply(t2).add(that.n.multiply(t1)), d.multiply(t2)).reduce();
+        return new Rational(n.multiply(t2).add(that.n.multiply(t1)), d.multiply(t2), context).reduce();
     }
 
     @NotNull
@@ -131,7 +133,7 @@ public final class Rational extends Generic implements Numeral{
         // d1 * d2 / gcd1 * gcd2
         final BigInteger newD = d.divide(gcd2).multiply(that.d.divide(gcd1));
 
-        return new Rational(newN, newD);
+        return new Rational(newN, newD, context);
     }
 
     @NotNull
@@ -186,21 +188,21 @@ public final class Rational extends Generic implements Numeral{
             gcd = gcd.negate();
         }
 
-        return gcd.signum() == 0 ? this : new Rational(n.divide(gcd), d.divide(gcd));
+        return gcd.signum() == 0 ? this : new Rational(n.divide(gcd), d.divide(gcd), context);
     }
 
     @NotNull
     public Rational inverse() {
         if (signum() < 0) {
-            return new Rational(d.negate(), n.negate());
+            return new Rational(d.negate(), n.negate(), context);
         } else {
-            return new Rational(d, n);
+            return new Rational(d, n, context);
         }
     }
 
     @NotNull
     public Rational gcd(@NotNull Rational that) {
-        return new Rational(n.gcd(that.n), lcm(d, that.d));
+        return new Rational(n.gcd(that.n), lcm(d, that.d), context);
     }
 
     @NotNull
@@ -225,18 +227,18 @@ public final class Rational extends Generic implements Numeral{
     }
 
     @NotNull
-    public Generic gcd() {
+    public GenericInteger getIntegerGcd() {
         return null;
     }
 
     @NotNull
     public Generic pow(int exponent) {
-        return new Rational(n.pow(exponent), d.pow(exponent));
+        return new Rational(n.pow(exponent), d.pow(exponent), context);
     }
 
     @NotNull
     public Generic negate() {
-        return new Rational(n.negate(), d);
+        return new Rational(n.negate(), d, context);
     }
 
     public int signum() {
@@ -248,40 +250,50 @@ public final class Rational extends Generic implements Numeral{
     }
 
     public Generic antiDerivative(@NotNull Variable variable) throws NotIntegrableException {
-        return multiply(variable.expressionValue());
+        return multiply(variable.asGeneric());
     }
 
     public Generic derivative(@NotNull Variable variable) {
-        return GenericInteger.valueOf(0);
+        return context.getZero();
     }
 
     public Generic substitute(@NotNull Variable variable, Generic generic) {
         return this;
     }
 
+    @Override
+    public Generic newInstance(@NotNull Generic generic) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @NotNull
     public Generic expand() {
         return this;
     }
 
+    @NotNull
     public Generic factorize() {
         return expressionValue().factorize();
     }
 
+    @NotNull
     public Generic elementary() {
         return this;
     }
 
+    @NotNull
     public Generic simplify() {
         return reduce();
     }
 
+    @NotNull
     public Generic numeric() {
-        return new NumericWrapper(this);
+        return GenericNumeric.newInstance(this);
     }
 
     @NotNull
     public Rational valueOf(@NotNull GenericInteger that) {
-        return newInstance(that.getContent());
+        return newInstance(that.getContent(), context);
     }
 
     @NotNull
@@ -295,46 +307,57 @@ public final class Rational extends Generic implements Numeral{
                GenericInteger denominator = (GenericInteger) g[1];
                return new Rational(numerator.getContent(), denominator.getContent());
                */// todo serso: implement
+            throw new UnsupportedOperationException();
         } else if (that instanceof GenericInteger) {
             return valueOf((GenericInteger) that);
+        } else {
+            throw new ArithmeticException();
         }
     }
 
-    public Generic[] sumValue() {
+    @NotNull
+    public List<? extends Generic> sumValue() {
         try {
-            if (integerValue().signum() == 0) return new Generic[0];
-            else return new Generic[]{this};
+            if (integerValue().isZero()) {
+                return Collections.emptyList();
+            } else {
+                return Arrays.asList(this);
+            }
         } catch (NotIntegerException e) {
-            return new Generic[]{this};
+            return Arrays.asList(this);
         }
     }
 
-    public Generic[] productValue() throws NotProductException {
+    @NotNull
+    public List<? extends Generic> productValue() throws NotProductException {
         try {
-            if (integerValue().compareTo(GenericInteger.valueOf(1)) == 0) return new Generic[0];
-            else return new Generic[]{this};
+            if (integerValue().isOne()){
+                return Collections.emptyList();                
+            } else {
+                return Arrays.asList(this);
+            }
         } catch (NotIntegerException e) {
-            return new Generic[]{this};
+            return Arrays.asList(this);
         }
     }
-
+/*
     public Power powerValue() throws NotPowerException {
         return new Power(this, 1);
-    }
+    }*/
 
     public Expression expressionValue() throws NotExpressionException {
-        return Expression.valueOf(this);
+        return Expression.newInstance(this);
     }
 
     public GenericInteger integerValue() throws NotIntegerException {
         if (d.compareTo(BigInteger.ONE) == 0) {
-            return new GenericInteger(n);
+            return context.newInteger(n);
         } else {
             throw new NotIntegerException();
         }
     }
 
-    @Override
+/*    @Override
     public boolean isInteger() {
         try {
             integerValue();
@@ -342,24 +365,25 @@ public final class Rational extends Generic implements Numeral{
         } catch (NotIntegerException e) {
             return false;
         }
-    }
+    }*/
 
     @NotNull
     public Variable variableValue() throws NotVariableException {
         try {
             return integerValue().variableValue();
         } catch (NotIntegerException e) {
-            if (n.compareTo(BigInteger.ONE) == 0) {
-                return new Inverse(new GenericInteger(d));
+            /*if (n.compareTo(BigInteger.ONE) == 0) {
+                return new Inverse(new GenericInteger(d, context));
             } else {
-                return new Fraction(new GenericInteger(n), new GenericInteger(d));
-            }
+                return new Fraction(new GenericInteger(n, context), new GenericInteger(d, context));
+            }*/
+            throw new UnsupportedOperationException();
         }
     }
 
     @NotNull
-    public Variable[] variables() {
-        return new Variable[0];
+    public List<Variable> variables() {
+        return Collections.emptyList();
     }
 
     public boolean isPolynomial(@NotNull Variable variable) {
@@ -407,10 +431,10 @@ public final class Rational extends Generic implements Numeral{
         int exponent = data instanceof Integer ? (Integer) data : 1;
         if (exponent == 1) bodyToMathML(element);
         else {
-            MathML e1 = element.element("msup");
+            MathML e1 = element.newElement("msup");
             bodyToMathML(e1);
-            MathML e2 = element.element("mn");
-            e2.appendChild(element.text(String.valueOf(exponent)));
+            MathML e2 = element.newElement("mn");
+            e2.appendChild(element.newText(String.valueOf(exponent)));
             e1.appendChild(e2);
             element.appendChild(e1);
         }
@@ -421,24 +445,24 @@ public final class Rational extends Generic implements Numeral{
         return d.compareTo(BigInteger.ZERO) == 0;
     }
 
-    @NotNull
+/*    @NotNull
     @Override
     public Set<? extends Constant> getConstants() {
         return Collections.emptySet();
-    }
+    }*/
 
     void bodyToMathML(MathML element) {
         try {
-            MathML e1 = element.element("mn");
-            e1.appendChild(element.text(String.valueOf(integerValue())));
+            MathML e1 = element.newElement("mn");
+            e1.appendChild(element.newText(String.valueOf(integerValue())));
             element.appendChild(e1);
         } catch (NotIntegerException e) {
-            MathML e1 = element.element("mfrac");
-            MathML e2 = element.element("mn");
-            e2.appendChild(element.text(String.valueOf(n)));
+            MathML e1 = element.newElement("mfrac");
+            MathML e2 = element.newElement("mn");
+            e2.appendChild(element.newText(String.valueOf(n)));
             e1.appendChild(e2);
-            e2 = element.element("mn");
-            e2.appendChild(element.text(String.valueOf(d)));
+            e2 = element.newElement("mn");
+            e2.appendChild(element.newText(String.valueOf(d)));
             e1.appendChild(e2);
             element.appendChild(e1);
         }

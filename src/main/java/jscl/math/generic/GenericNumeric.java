@@ -7,7 +7,8 @@ import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * User: serso
@@ -15,9 +16,24 @@ import java.util.Set;
  * Time: 12:57 PM
  */
 public class GenericNumeric extends Generic{
+
+    public GenericNumeric(@NotNull GenericContext context) {
+        super(context);
+    }
+
+    @NotNull
+    public static GenericNumeric newInstance(@NotNull GenericInteger that ) {
+        throw new UnsupportedOperationException();
+    }
+
+    @NotNull
+    public static GenericNumeric newInstance(@NotNull Rational that ) {
+        throw new UnsupportedOperationException();
+    }
+
     @NotNull
     @Override
-    protected Generic gcd() {
+    protected GenericInteger getIntegerGcd() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -37,18 +53,35 @@ public class GenericNumeric extends Generic{
     }
 
     @Override
-    public Generic newInstance(Generic generic) {
+    public Generic newInstance(@NotNull Generic generic) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Generic[] sumValue() {
-        return new Generic[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @NotNull
     @Override
-    public Set<Variable> variables() {
+    public List<Generic> sumValue() {
+        return Collections.emptyList();
+    }
+
+    @NotNull
+    @Override
+    public List<? extends Generic> productValue() throws NotProductException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public GenericInteger integerValue() throws NotIntegerException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Variable variableValue() throws NotVariableException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @NotNull
+    @Override
+    public List<Variable> variables() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

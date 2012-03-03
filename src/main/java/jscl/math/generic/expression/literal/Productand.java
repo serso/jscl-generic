@@ -2,6 +2,8 @@ package jscl.math.generic.expression.literal;
 
 
 import jscl.math.Variable;
+import jscl.math.generic.Generic;
+import jscl.math.generic.NotVariableException;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -40,4 +42,21 @@ public class Productand {
         return exponent;
     }
 
+    @NotNull
+    public Variable variableValue() {
+        if ( exponent == 1 ) {
+            return variable;
+        } else {
+            throw new NotVariableException();
+        }
+    }
+
+    @NotNull
+    public Generic asGeneric() {
+        if (exponent == 0) {
+            return variable.getContext().getOne();
+        } else {
+            return variable.asGeneric().pow(exponent);
+        }
+    }
 }

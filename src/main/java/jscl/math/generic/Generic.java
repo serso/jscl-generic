@@ -5,9 +5,21 @@ import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.List;
 
 public abstract class Generic implements Arithmetic<Generic>, Comparable, Transformable, IGeneric<Generic> {
+
+    @NotNull
+    protected final GenericContext context;
+
+    protected Generic(@NotNull GenericContext context) {
+        this.context = context;
+    }
+
+    @NotNull
+    public GenericContext getContext() {
+        return context;
+    }
 
     @NotNull
     public Generic subtract(@NotNull Generic that) {
@@ -21,9 +33,9 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     @NotNull
     public DivideAndRemainderResult divideAndRemainder(@NotNull Generic generic) {
         try {
-            return DivideAndRemainderResult.newInstance(divide(generic), GenericInteger.newInstance(0));
+            return DivideAndRemainderResult.newInstance(divide(generic), context.getZero());
         } catch (NotDivisibleException e) {
-            return DivideAndRemainderResult.newInstance(GenericInteger.newInstance(0), this);
+            return DivideAndRemainderResult.newInstance(context.getZero(), this);
         }
     }
 
@@ -35,7 +47,7 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     @NotNull
     @Override
     public Generic inverse() {
-        return GenericInteger.ONE.divide(this);
+        return context.getOne().divide(this);
     }
 
     @Override
@@ -45,11 +57,14 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
         return this.divide(gcd).multiply(that);
     }
 
+    /**
+     * @return integer value to be the greatest common divisor of this object
+     */
     @NotNull
-    protected abstract GenericInteger gcd();
+    protected abstract GenericInteger getIntegerGcd();
 
     public Generic[] gcdAndNormalize() {
-        Generic gcd = gcd();
+        GenericInteger gcd = getIntegerGcd();
 
         if (gcd.signum() == 0) {
             return new Generic[]{gcd, this};
@@ -72,7 +87,7 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
     public Generic pow(int exponent) {
         assert exponent >= 0;
 
-        Generic result = GenericInteger.ONE;
+        Generic result = context.getOne();
 
         for (int i = 0; i < exponent; i++) {
 
@@ -100,13 +115,15 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
 
     public abstract Generic substitute(@NotNull Variable variable, Generic generic);
 
-    public abstract Generic newInstance(Generic generic);
+    public abstract Generic newInstance(@NotNull Generic generic);
 
-    public abstract Generic[] sumValue();
+    @NotNull
+    public abstract List<? extends Generic> sumValue();
 
-/*	public abstract Generic[] productValue() throws NotProductException;
+    @NotNull
+	public abstract List<? extends Generic> productValue() throws NotProductException;
 
-	public abstract Power powerValue() throws NotPowerException;
+/*	public abstract Power powerValue() throws NotPowerException;
 
 	public abstract Expression expressionValue() throws NotExpressionException;
 
@@ -117,7 +134,7 @@ public abstract class Generic implements Arithmetic<Generic>, Comparable, Transf
 	public abstract Variable variableValue() throws NotVariableException;
 
     @NotNull
-    public abstract Set<Variable> variables();
+    public abstract List<Variable> variables();
 
     public abstract boolean isPolynomial(@NotNull Variable variable);
 

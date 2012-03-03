@@ -7,25 +7,26 @@ import org.jetbrains.annotations.NotNull;
  * Date: 2/19/12
  * Time: 12:12 AM
  */
-public class DivideAndRemainderResult {
+public class DivideAndRemainderResult<G extends Generic> {
 
     @NotNull
-    private final Generic divisionResult;
+    private final G divisionResult;
 
     @NotNull
     private final Generic remainder;
 
-    private DivideAndRemainderResult(@NotNull Generic divisionResult, @NotNull Generic remainder) {
+    private DivideAndRemainderResult(@NotNull G divisionResult, @NotNull Generic remainder) {
         this.divisionResult = divisionResult;
         this.remainder = remainder;
     }
 
-    public static DivideAndRemainderResult newInstance(@NotNull Generic divisionResult, @NotNull Generic remainder) {
-        return new DivideAndRemainderResult(divisionResult, remainder);
+    @NotNull
+    public static <G extends Generic> DivideAndRemainderResult<G> newInstance(@NotNull G divisionResult, @NotNull Generic remainder) {
+        return new DivideAndRemainderResult<G>(divisionResult, remainder);
     }
 
     @NotNull
-    public Generic getDivisionResult() {
+    public G getDivisionResult() {
         return divisionResult;
     }
 

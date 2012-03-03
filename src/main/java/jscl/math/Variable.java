@@ -1,6 +1,7 @@
 package jscl.math;
 
 import jscl.math.generic.Generic;
+import jscl.math.generic.GenericContext;
 import jscl.mathml.MathML;
 import jscl.util.TextUtils;
 import org.jetbrains.annotations.NotNull;
@@ -22,8 +23,17 @@ public abstract class Variable implements Comparable<Variable>, MathEntity, Tran
 
     private boolean system = true;
 
-    public Variable(@NotNull String name) {
+    @NotNull
+    private final GenericContext context;
+
+    public Variable(@NotNull String name, @NotNull GenericContext context) {
         this.name = name;
+        this.context = context;
+    }
+
+    @NotNull
+    public GenericContext getContext() {
+        return context;
     }
 
     @NotNull
@@ -72,13 +82,13 @@ public abstract class Variable implements Comparable<Variable>, MathEntity, Tran
         return Expression.valueOf(this);
     }*/
 
-    public abstract boolean isConstant(Variable variable);
+    public abstract boolean isConstant(@NotNull Variable variable);
 
     public boolean isIdentity(@NotNull Variable variable) {
         return this.compareTo(variable) == 0;
     }
 
-    public abstract int compareTo(Variable variable);
+    public abstract int compareTo(@NotNull Variable variable);
 
     public boolean equals(Object obj) {
         return obj instanceof Variable && compareTo((Variable) obj) == 0;
@@ -128,5 +138,8 @@ public abstract class Variable implements Comparable<Variable>, MathEntity, Tran
 /*
 	@NotNull
 	public abstract Set<? extends Constant> getConstants();*/
+
+    @NotNull
+    public abstract Generic asGeneric();
 }
 

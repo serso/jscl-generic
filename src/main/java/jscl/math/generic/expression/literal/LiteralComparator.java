@@ -15,8 +15,8 @@ enum LiteralComparator implements Comparator<Literal> {
     instance;
 
     public int compare(@NotNull Literal l, @NotNull Literal r) {
-        final MutableInt li = new MutableInt(l.getSize());
-        final MutableInt ri = new MutableInt(r.getSize());
+        final MutableInt li = new MutableInt(l.getSize() - 1);
+        final MutableInt ri = new MutableInt(r.getSize() - 1);
 
         Productand lp = LiteralUtils.getPrev(l, li);
         Productand rp = LiteralUtils.getPrev(r, ri);

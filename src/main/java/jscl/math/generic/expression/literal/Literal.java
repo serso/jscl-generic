@@ -7,6 +7,8 @@ import jscl.math.NotDivisibleException;
 import jscl.math.Transformable;
 import jscl.math.Variable;
 import jscl.math.generic.Generic;
+import jscl.math.generic.NotProductException;
+import jscl.math.generic.NotVariableException;
 import jscl.mathml.MathML;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +19,7 @@ import java.util.*;
 /**
  * Literal = ( var[0] ^ power[0] ) * ( var[1] ^ power[1] ) * ...
  */
-public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
+public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable, Iterable<Productand> {
 
     private static final Literal EMPTY_LITERAL = new Literal(Collections.<Productand>emptyList());
 
@@ -28,6 +30,26 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
     private final List<Variable> variables;
 
     private final int degree;
+
+    @Override
+    public Iterator<Productand> iterator() {
+        return productands.iterator();
+    }
+
+    public Variable variableValue() {
+        int size = getSize();
+        if (size == 0) {
+            throw new NotVariableException();
+        } else if (size == 1) {
+            final Productand p = productands.get(0);
+            return p.variableValue();
+        } else {
+            throw new NotVariableException();
+        }
+    }
+
+
+
 
     /*
    * *********************************************************************
@@ -143,11 +165,18 @@ public class Literal implements Comparable, ToMathMlWritable, ToJavaWritable {
         return LiteralLcm.instance.lcm(this, that);
     }
 
-/*	public Generic[] productValue() throws NotProductException {
-		Generic a[] = new Generic[size];
-		for (int i = 0; i < a.length; i++) a[i] = variables[i].expressionValue().pow(powers[i]);
-		return a;
-	}
+    @NotNull
+    public List<Generic> productValue() throws NotProductException {
+        final List<Generic> result = new ArrayList<Generic>(getSize());
+
+        for (Productand productand : productands) {
+            result.add(productand.asGeneric());
+        }
+
+        return result;
+    }
+    
+/*	
 
 	public Power powerValue() throws NotPowerException {
 		if (size == 0) return new Power(JsclInteger.valueOf(1), 1);
